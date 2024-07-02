@@ -1,5 +1,5 @@
 .navbar {
-    background-color: #1a1a1a;
+    background-color: #0b0113;
     color: #fff;
     display: flex;
     justify-content: space-between;
@@ -32,14 +32,16 @@
     padding: 0.5rem 1rem;
     margin-left: 0.5rem;
     border: none;
-    background-color: #555;
+    background-color: #0b0113;
     color: #fff;
     cursor: pointer;
     border-radius: 4px;
+    border-color: white;
 }
 
 .search-button:hover {
     background-color: #444;
+    
 }
 
 .nav-items {
