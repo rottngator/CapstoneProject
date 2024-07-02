@@ -11,9 +11,9 @@ const App = () => {
         <Router>
             <NavBar />
             <Routes>
-                <Route path='/' exact component={Home} />
-                <Route path='/profile' component={ProfileView} />
-                <Route path='/upload' component={MusicUpload} />
+                <Route path='/' element={<Home />} />
+                <Route path='/profile' element={<ProfileView />} />
+                <Route path='/upload' element={<MusicUpload />} />
             </Routes>
         </Router>
     );
