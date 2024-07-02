@@ -11,12 +11,12 @@ const NavBar = () => {
     return (
         <nav className='navbar'>
             <div className='logo'>
-                <img src='/frontend/public/images/logo.png' alt='logo'/>
+                <img src='/frontend/public/images/The Sound Hub Logo.png' alt='logo'/>
                 <span>The Sound Hub</span>
             </div>
             
             <div className='search-container'>
-                <input type='text' className='search-bar' placeholder='Search' />
+                <input type='text' className='search-bar' />
                 <button className='search-button'>Search</button>
             </div>
             <div className='dropdown'>
