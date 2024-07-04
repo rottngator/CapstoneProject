@@ -11,7 +11,7 @@ const NavBar = () => {
     return (
         <nav className='navbar'>
             <div className='logo'>
-                <img src='/frontend/public/images/The Sound Hub Logo.png' alt='logo'/>
+                <img src='/images/The Sound Hub Logo.png' alt='logo'/>
                 <span>The Sound Hub</span>
             </div>
             
