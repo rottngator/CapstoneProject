@@ -1,4 +1,5 @@
-import React from 'react'
+import React from 'react';
+import './Home.css';
 
 const Home = () => {
     return (
@@ -39,52 +40,48 @@ const Home = () => {
                     <div className='create'>
                         <button>Create</button>
                     </div>
+                </div>
 
-                    <div className='featured-tracks'>
-                        <h3>Featured Tracks</h3>
-                        <div className='track'>
-                            <img src='/frontend/public/images/track.jpg' alt='featured track'/>
-                            <div className='track-info'>
-                                <h4>Track Title Here</h4>
-                                <p>Artist</p>
-                                <div className='track-details'>
-                                    <div className='track-stats'>
-                                        <div>Streams</div>
-                                        <div>00</div>
-                                    </div>
-                                    <div className='track-stats'>
-                                        <div>Likes</div>
-                                        <div>00</div>
-                                    </div>
-                                    <div className='track-stats'>
-                                        <div>Comments</div>
-                                        <div>00</div>
-                                    </div>
+                <div className='featured-tracks'>
+                    <h3>Featured Tracks</h3>
+                    <div className='track'>
+                        <img src='/frontend/public/images/track.jpg' alt='featured track'/>
+                        <div className='track-info'>
+                            <h4>Track Title Here</h4>
+                            <p>Artist</p>
+                            <div className='track-details'>
+                                <div className='track-stats'>
+                                    <div>Streams</div>
+                                    <div>00</div>
                                 </div>
-                            </div> 
-
-                            <div className='lyrics'>
-                                <h4>Lyrics</h4>
-                                <p>text text text text...</p>
+                                <div className='track-stats'>
+                                    <div>Likes</div>
+                                    <div>00</div>
+                                </div>
+                                <div className='track-stats'>
+                                    <div>Comments</div>
+                                    <div>00</div>
+                                </div>
                             </div>
+                        </div> 
 
+                        <div className='lyrics'>
+                            <h4>Lyrics</h4>
+                            <p>text text text text...</p>
                         </div>
-
                     </div>
+                </div>
 
-                    <div className='sidebar-right'>
-                        <h3>Sound Hub News</h3>
-                        <div className='news-item'>text text text...</div>
-                        <div className='news-item'>text text text...</div>
-                        <div className='news-item'>text text text...</div>
-                        <div className='news-item'>text text text...</div>
-                    </div>
-
+                <div className='sidebar-right'>
+                    <h3>Sound Hub News</h3>
+                    <div className='news-item'>text text text...</div>
+                    <div className='news-item'>text text text...</div>
+                    <div className='news-item'>text text text...</div>
+                    <div className='news-item'>text text text...</div>
                 </div>
             </div>
-            
         </div>
     );
 };
 
-export default Home
+export default Home;

@@ -1,0 +1,112 @@
+.home-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #0b0113;
+    color: white;
+}
+
+.main-content {
+    display: flex;
+    flex: 1;
+    padding: 1rem;
+    gap: 1rem;
+}
+
+.sidebar-left, .sidebar-right {
+    width: 20%;
+    background-color: #15021e;
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.featured-tracks {
+    flex: 1;
+    background-color: #15021e;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.public-chatrooms, .following, .create, .news-item {
+    background-color: #0b0113;
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.user {
+    margin-bottom: 1rem;
+}
+
+.status {
+    display: flex;
+    flex-direction: column;
+}
+
+.track {
+    display: flex;
+    background-color: #0b0113;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.track img {
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    margin-right: 1rem;
+}
+
+.track-info {
+    flex: 1;
+}
+
+.track-details {
+    display: flex;
+    justify-content: space-between;
+}
+
+.track-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.lyrics {
+    background-color: #15021e;
+    border-radius: 10px;
+    padding: 1rem;
+    width: 200px;
+    text-align: left;
+}
+
+button {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: #6d47a7;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #58358e;
+}
+
+h3 {
+    margin-bottom: 1rem;
+}
+
+h4 {
+    margin-top: 0;
+}
+
+.more, .news-item {
+    text-align: left;
+}

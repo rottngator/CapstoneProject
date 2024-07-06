@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios';
+import './Register.css';
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -17,29 +18,34 @@ const Register = () => {
         }
     }
     return (
-        <div>
-            <h2>Register</h2>
-
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Username:</label>
-                    <input type='text' value={username} onChange={(e) => setUsername(e.target.value)} required />
-                </div>
-
-                <div>
-                    <label>Email:</label>
-                    <input type='email' value={email} onChange={(e) => setEmail(e.target.value)} required />
-                </div>
-
-                <div>
-                    <label>Password:</label>
-                    <input type='password' value={password} onChange={(e) => setPassword(e.target.value)} required />
-                </div>
-                <button type='submit'>Register</button>
-            </form>
-            <p>{message}</p>
+        <div className="register-page">
+            <div className="register-form-container">
+                <h1>Register</h1>
+                <form className="register-form">
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input type="email" id="email" name="email" />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="username">Username</label>
+                        <input type="text" id="username" name="username" />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <input type="password" id="password" name="password" />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="confirmPassword">Password Again</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" />
+                    </div>
+                    <button type="submit" className="register-button">Register</button>
+                </form>
+            </div>
+            <div className="logo-container">
+                <img src="/images/The Sound Hub Logo.png" alt="The Sound Hub" className="logo"/>
+            </div>
         </div>
-    )
-}
+    );
+};
 
-export default Register
+export default Register;
