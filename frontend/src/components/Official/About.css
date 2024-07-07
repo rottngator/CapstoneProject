@@ -1,0 +1,41 @@
+.about-me {
+    color: #fff;
+    background-color: #15021e;
+    padding: 20px;
+    font-family: 'Arial, sans-serif';
+    line-height: 1.6;
+}
+
+.hero {
+    background: url('/path/to/hero-image.jpg') no-repeat center center/cover;
+    color: #fff;
+    text-align: center;
+    padding: 100px 0;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin: 0;
+}
+
+.section {
+    margin: 40px 0;
+}
+
+.section h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.section p, .section ul {
+    font-size: 1.2rem;
+}
+
+ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+ul li {
+    margin-bottom: 10px;
+}

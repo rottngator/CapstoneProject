@@ -7,6 +7,14 @@ import './App.css';
 import MusicUpload from './components/Artists/MusicUpload';
 import Register from './components/Authentication/Register';
 import Login from './components/Authentication/Login';
+import CommunityChat from './components/Community/CommunityChat';
+import EventCalendar from './components/Community/EventCalendar';
+import EventDetails from './components/Community/EventDetails';
+
+const events = [
+    { id: 1, date: new Date(2024, 6, 10), title: 'Event 1', description: 'Description 1', location: 'Location 1', time: '10:00 AM' },
+    { id: 2, date: new Date(2024, 6, 15), title: 'Event 2', description: 'Description 2', location: 'Location 2', time: '2:00 PM' },
+];
 
 const App = () => {
     return (
@@ -18,6 +26,9 @@ const App = () => {
                 <Route path='/upload' element={<MusicUpload />} />
                 <Route path='/register' element={<Register />} />
                 <Route path='/login' element={<Login />} />
+                <Route path='/chat' element={<CommunityChat />} />
+                <Route path='/calendar' element={<EventCalendar />} />
+                <Route path='/event/:id' element={<EventDetails events={events}/>} />
             </Routes>
         </Router>
     );
