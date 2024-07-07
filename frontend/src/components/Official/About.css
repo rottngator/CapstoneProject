@@ -6,36 +6,40 @@
     line-height: 1.6;
 }
 
-.hero {
-    background: url('/path/to/hero-image.jpg') no-repeat center center/cover;
-    color: #fff;
-    text-align: center;
-    padding: 100px 0;
+.profile-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
 }
 
-.hero h1 {
-    font-size: 3rem;
-    margin: 0;
+.profile-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    margin-right: 20px;
+    border: 5px solid #fff;
 }
 
-.section {
-    margin: 40px 0;
+.about-text {
+    max-width: 600px;
 }
 
-.section h2 {
+.about-text h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.vision-section {
+    background-color: #1d1033;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.vision-section h2 {
     font-size: 2rem;
     margin-bottom: 20px;
 }
 
-.section p, .section ul {
+.vision-section p {
     font-size: 1.2rem;
-}
-
-ul {
-    list-style-type: disc;
-    padding-left: 20px;
-}
-
-ul li {
-    margin-bottom: 10px;
 }

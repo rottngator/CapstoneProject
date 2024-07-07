@@ -1,0 +1,68 @@
+.feedback-form {
+    background-color: #1a1a2e;
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    width: 50%;
+    margin: 0 auto;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.feedback-form h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.feedback-form p {
+    margin: 10px 0;
+}
+
+.feedback-form form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.feedback-form label {
+    margin: 10px 0;
+}
+
+.feedback-form textarea {
+    width: 80%;
+    height: 100px;
+    margin: 10px 0;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    margin-top: 20px;
+}
+
+.cancel-button, .submit-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.cancel-button {
+    background-color: #555;
+    color: #fff;
+}
+
+.submit-button {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+.cancel-button:hover, .submit-button:hover {
+    opacity: 0.8;
+}

@@ -10,6 +10,8 @@ import Login from './components/Authentication/Login';
 import CommunityChat from './components/Community/CommunityChat';
 import EventCalendar from './components/Community/EventCalendar';
 import EventDetails from './components/Community/EventDetails';
+import About from './components/Official/About';
+import Feedback from './components/Community/Feedback';
 
 const events = [
     { id: 1, date: new Date(2024, 6, 10), title: 'Event 1', description: 'Description 1', location: 'Location 1', time: '10:00 AM' },
@@ -29,6 +31,8 @@ const App = () => {
                 <Route path='/chat' element={<CommunityChat />} />
                 <Route path='/calendar' element={<EventCalendar />} />
                 <Route path='/event/:id' element={<EventDetails events={events}/>} />
+                <Route path='/about' element={<About />} />
+                <Route path='/feedback' element={<Feedback />} />
             </Routes>
         </Router>
     );
