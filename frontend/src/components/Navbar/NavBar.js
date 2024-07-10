@@ -20,7 +20,7 @@ const NavBar = () => {
                 <button className='search-button'>Search</button>
             </div>
             <div className='dropdown'>
-                <img src='profile-pic-url' alt='Profile' className='profile-pic' onClick={toggleDropdown} />
+                <img src='/images/jensen1.jpg' alt='Profile' className='profile-pic' onClick={toggleDropdown} />
                 {dropdownVisible && (
                     <div className='dropdown-menu'>
                         <a href='/profile'>Profile</a>
