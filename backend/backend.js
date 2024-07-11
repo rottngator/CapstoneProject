@@ -3,34 +3,49 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const { DAL } = require('./dal/mongoDAL');
+const authRoute = require('./routes/auth');
 const app = express();
 const port = 3000;
 
+// Middleware
 app.use(bodyParser.json());
 
 // Session middleware setup
 app.use(session({
-    secret: 'your_secret_key',
+    secret: 'nepenthe', 
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: 'mongodb+srv://lunruh:Abby2525!@cluster0.ntcrjfg.mongodb.net/SoundHub' }),
-    cookie: { secure: false } 
+    cookie: { secure: false }
 }));
 
-// Registering
-app.post('/api/register', async (req, res) => {
+app.use('/api', authRoute);
+
+// register route
+app.post('/register', async (req, res) => {
+    const { username, email, password } = req.body;
     try {
-        const user = await DAL.createUser(req.body);
+        const existingEmail = await DAL.getUserByEmail(email);
+        if (existingEmail) {
+            return res.status(400).json({ error: 'Email already taken' });
+        }
+        
+        const existingUsername = await DAL.getUserByUsername(username);
+        if (existingUsername) {
+            return res.status(400).json({ error: 'Username already taken' });
+        }
+        
+        const user = await DAL.createUser({ username, email, password });
         res.status(201).json(user);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// User login
-app.post('/api/login', async (req, res) => {
+// login route
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
     try {
-        const { email, password } = req.body;
         const user = await DAL.getUserByEmail(email);
         if (!user) {
             return res.status(400).json({ error: 'Invalid email or password' });
@@ -48,8 +63,8 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Logout route
-app.post('/api/logout', (req, res) => {
+// logout route
+app.post('/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) {
             return res.status(500).json({ error: 'Logout failed' });
@@ -58,8 +73,8 @@ app.post('/api/logout', (req, res) => {
     });
 });
 
-// Get current user route
-app.get('/api/me', async (req, res) => {
+// get current user route
+app.get('/me', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ error: 'Not authenticated' });
     }

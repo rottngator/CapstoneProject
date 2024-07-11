@@ -1,15 +1,17 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+// user schema
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true }
 });
 
+// current model/s
 const User = mongoose.model('User', userSchema);
 
-// Connection string
+// connection string
 mongoose.connect('mongodb+srv://lunruh:Abby2525!@cluster0.ntcrjfg.mongodb.net/SoundHub', {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -17,6 +19,7 @@ mongoose.connect('mongodb+srv://lunruh:Abby2525!@cluster0.ntcrjfg.mongodb.net/So
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
 
+    // the exports
 exports.DAL = {
     createUser: async (userData) => {
         const salt = await bcrypt.genSalt(10);
