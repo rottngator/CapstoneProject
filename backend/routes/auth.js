@@ -2,6 +2,13 @@ const express = require('express');
 const { DAL } = require('../dal/mongoDAL'); // Adjust the path as needed
 const router = express.Router();
 
+const isAuthenticated = (req, res, next) => {
+    if (req.session.userId) {
+        return next();
+    }
+    res.status(401).json({ error: 'Unauthorized' });
+};
+
 // Register route
 router.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
@@ -71,4 +78,4 @@ router.get('/me', async (req, res) => {
     }
 });
 
-module.exports = router;
+module.exports = router, isAuthenticated;

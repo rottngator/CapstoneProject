@@ -1,5 +1,6 @@
+// App.js
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import NavBar from './components/Navbar/NavBar';
 import Home from './components/Home/Home';
 import ProfileView from './components/Profile/ProfileView';
@@ -12,6 +13,7 @@ import EventCalendar from './components/Community/EventCalendar';
 import EventDetails from './components/Community/EventDetails';
 import About from './components/Official/About';
 import Feedback from './components/Community/Feedback';
+import PrivateRoute from './components/PrivateRoute';
 
 const events = [
     { id: 1, date: new Date(2024, 6, 10), title: 'Event 1', description: 'Description 1', location: 'Location 1', time: '10:00 AM' },
@@ -20,21 +22,21 @@ const events = [
 
 const App = () => {
     return (
-        <Router>
+        <div>
             <NavBar />
             <Routes>
                 <Route path='/' element={<Home />} />
-                <Route path='/profile' element={<ProfileView />} />
-                <Route path='/upload' element={<MusicUpload />} />
                 <Route path='/register' element={<Register />} />
                 <Route path='/login' element={<Login />} />
-                <Route path='/chat' element={<CommunityChat />} />
-                <Route path='/calendar' element={<EventCalendar />} />
-                <Route path='/event/:id' element={<EventDetails events={events}/>} />
+                <PrivateRoute path='/profile' element={<ProfileView />} />
+                <PrivateRoute path='/upload' element={<MusicUpload />} />
+                <PrivateRoute path='/chat' element={<CommunityChat />} />
+                <PrivateRoute path='/calendar' element={<EventCalendar />} />
+                <PrivateRoute path='/event/:id' element={<EventDetails events={events} />} />
                 <Route path='/about' element={<About />} />
-                <Route path='/feedback' element={<Feedback />} />
+                <PrivateRoute path='/feedback' element={<Feedback />} />
             </Routes>
-        </Router>
+        </div>
     );
 };
 
