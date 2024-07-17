@@ -1,21 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Login.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../Context/AuthContext';
 
 const Login = () => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const { login } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // mock logic
+        if (username && password) {
+            login({ username });
+            const redirectTo = location.state?.from?.pathname || '/';
+            navigate(redirectTo);
+        }
+    };
+
     return (
         <div className="login-page">
             <div className="login-form-container">
                 <h1>Login</h1>
                 <h2>Welcome Back!</h2>
-                <form className="login-form">
+                <form className="login-form" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="username">Username / Email</label>
-                        <input type="text" id="username" name="username" />
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)} 
+                        />
                     </div>
                     <div className="form-group">
                         <label htmlFor="password">Password</label>
-                        <input type="password" id="password" name="password" />
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)} 
+                        />
                     </div>
                     <div className="form-group">
                         <Link to="/reset" className="reset-link">Forgot password? Reset</Link>

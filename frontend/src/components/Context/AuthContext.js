@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../../firebase'; // Replace with your Firebase config or auth logic
+import React, { createContext, useContext, useState } from 'react';
 
 const AuthContext = createContext();
 
@@ -9,24 +8,24 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState(null);
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            setCurrentUser(user);
-            setLoading(false);
-        });
+    const login = (user) => {
+        setCurrentUser(user);
+    };
 
-        return unsubscribe;
-    }, []);
+    const logout = () => {
+        setCurrentUser(null);
+    };
 
     const value = {
         currentUser,
+        login,
+        logout,
     };
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children}
+            {children}
         </AuthContext.Provider>
     );
 }

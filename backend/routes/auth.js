@@ -1,5 +1,5 @@
 const express = require('express');
-const { DAL } = require('../dal/mongoDAL'); // Adjust the path as needed
+const { DAL } = require('../dal/mongoDAL'); 
 const router = express.Router();
 
 const isAuthenticated = (req, res, next) => {

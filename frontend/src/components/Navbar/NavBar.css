@@ -25,6 +25,8 @@
 .search-container {
     display: flex;
     align-items: center;
+    flex: 1; /* Makes the search container take available space */
+    margin: 0 1rem; /* Adds some space on both sides */
 }
 
 .search-bar {
@@ -35,6 +37,7 @@
     color: white; /* White text color */
     font-size: 1rem;
     outline: none; /* Remove default focus outline */
+    width: 100%; /* Makes the input take full width */
 }
 
 .search-bar::placeholder {
@@ -42,7 +45,7 @@
 }
 
 .search-button {
-    padding: 0.5rem 1rem;
+    padding: 0.3rem 0.8rem;
     background-color: #1a0b2e; /* Dark button background */
     color: white; /* White text color */
     border: 1px solid #ffffff; /* White border */
@@ -53,11 +56,13 @@
 }
 
 .search-button:hover {
-    background-color: #7242b1; /* Slightly lighter button background on hover */
+    background-color: #a469f0; /* Slightly lighter button background on hover */
 }
 
 .dropdown {
     position: relative;
+    display: flex; /* Align items horizontally */
+    align-items: center; /* Align items vertically */
 }
 
 .profile-pic {
