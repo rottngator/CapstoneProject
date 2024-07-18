@@ -1,62 +1,63 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../../api/api';
 import './Login.css';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../Context/AuthContext';
 
 const Login = () => {
-    const [username, setUsername] = useState('');
+    const [credential, setCredential] = useState('');
     const [password, setPassword] = useState('');
-    const { login } = useAuth();
     const navigate = useNavigate();
-    const location = useLocation();
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // mock logic
-        if (username && password) {
-            login({ username });
-            const redirectTo = location.state?.from?.pathname || '/';
-            navigate(redirectTo);
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            await login(credential, password);
+            navigate('/'); // Redirect to home or dashboard after login
+        } catch (error) {
+            alert('Login failed. Please check your credentials.');
         }
     };
 
     return (
         <div className="login-page">
-            <div className="login-form-container">
+            <div className="login-container">
                 <h1>Login</h1>
                 <h2>Welcome Back!</h2>
-                <form className="login-form" onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="username">Username / Email</label>
-                        <input 
-                            type="text" 
-                            id="username" 
-                            name="username" 
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)} 
+                <form onSubmit={handleSubmit}>
+                    <div className="input-group">
+                        <label htmlFor="credential">Username / Email</label>
+                        <input
+                            type="text"
+                            id="credential"
+                            placeholder="Username / Email"
+                            value={credential}
+                            onChange={(e) => setCredential(e.target.value)}
+                            required
                         />
                     </div>
-                    <div className="form-group">
+                    <div className="input-group">
                         <label htmlFor="password">Password</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="Password"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)} 
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
                         />
                     </div>
-                    <div className="form-group">
-                        <Link to="/reset" className="reset-link">Forgot password? Reset</Link>
+                    <div className="forgot-password">
+                        <a href="/reset">Forgot password? <span>Reset</span></a>
                     </div>
                     <button type="submit" className="login-button">Login</button>
-                    <div className="register-link">
-                        Never signed up before? <Link to="/register">Register</Link>
-                    </div>
                 </form>
+                <div className="register-link">
+                    <p>Never signed up before?</p>
+                    <a href="/register" className="register-button">Register</a>
+                </div>
             </div>
             <div className="logo-container">
-                <img src="/images/The Sound Hub Logo.png" alt="The Sound Hub" className="logo"/>
+                <img src="/images/The Sound Hub Logo.png" alt="The Sound Hub Logo" className="logo"/>
             </div>
         </div>
     );

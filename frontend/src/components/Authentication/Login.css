@@ -1,107 +1,115 @@
-body {
-    background-color: #0b0113;
-    color: white;
-    font-family: Arial, sans-serif;
-}
-
 .login-page {
     display: flex;
-    height: 100vh;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
+    height: 100vh;
     background-color: #0b0113;
+    color: white;
+    padding: 0 5rem;
 }
 
-.login-form-container {
-    background-color: #15021e;
+.login-container {
+    background-color: #1a0b2e;
+    padding: 3rem;
     border-radius: 10px;
-    padding: 2rem;
-    width: 400px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 100%;
+}
+
+h1, h2 {
+    margin: 0;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #2a1e46;
+    color: white;
+    font-size: 1rem;
+}
+
+.forgot-password {
+    margin-bottom: 1.5rem;
+    text-align: right;
+}
+
+.forgot-password a {
+    color: #7242b1;
+    text-decoration: none;
+}
+
+.forgot-password a span {
+    text-decoration: underline;
+}
+
+.login-button {
+    background-color: #7242b1;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.register-link {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.register-link p {
+    margin: 0;
+}
+
+.register-link .register-button {
+    background-color: #7242b1;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 0.5rem;
 }
 
 .logo-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 50px;
+    height: 100%;
 }
 
 .logo {
-    width: 300px;
-    height: auto;
-}
-
-h1 {
-    margin-bottom: 0;
-    font-size: 2.5rem;
-}
-
-h2 {
-    margin-top: 0;
-    margin-bottom: 2rem;
-    font-size: 1.5rem;
-    color: #9d85cc;
-}
-
-.login-form {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group {
-    margin-bottom: 1rem;
-}
-
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-input {
-    width: 100%;
-    padding: 0.5rem;
-    border: none;
-    border-radius: 5px;
-    background-color: #0b0113;
-    color: white;
-}
-
-.reset-link {
-    display: inline-block;
-    margin-top: 0.5rem;
-    color: #9d85cc;
-}
-
-.reset-link:hover {
-    color: #b897d4;
-}
-
-.login-button {
-    padding: 0.75rem;
-    border: none;
-    border-radius: 5px;
-    background-color: #6d47a7;
-    color: white;
-    font-size: 1rem;
-    cursor: pointer;
-}
-
-.login-button:hover {
-    background-color: #58358e;
-}
-
-.register-link {
-    margin-top: 1rem;
-    text-align: center;
-    color: white;
-}
-
-.register-link a {
-    color: #9d85cc;
-    text-decoration: none;
-}
-
-.register-link a:hover {
-    color: #b897d4;
+    width: 50%;
 }

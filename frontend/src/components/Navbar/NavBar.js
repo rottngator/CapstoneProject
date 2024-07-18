@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getCurrentUser, logout } from '../../api/api';
+import './NavBar.css';
 
 const NavBar = () => {
     const [user, setUser] = useState(null);
