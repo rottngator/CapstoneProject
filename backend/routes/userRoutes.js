@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../dal/mongoDAL'); 
+const User = require('../dal/mongoDAL');
 const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = 'nepenthe';
@@ -31,3 +31,4 @@ router.get('/profile', authenticate, async (req, res) => {
 });
 
 module.exports = router;
+

@@ -16,6 +16,7 @@ app.use(cors({
 
 // Middleware
 app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session({
     secret: 'the_night_does_not_belong_to_god',
@@ -25,8 +26,8 @@ app.use(session({
 }));
 
 // Routes
+app.use('/user', userRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes);
 
 // Start server
 app.listen(port, () => {
