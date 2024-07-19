@@ -27,7 +27,7 @@ app.use(session({
 
 // Routes
 app.use('/user', userRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
 
 // Start server
 app.listen(port, () => {

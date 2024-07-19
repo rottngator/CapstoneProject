@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/user';
+const API_URL = 'http://localhost:3000/'; 
 
 export const register = async (userData) => {
     return axios.post(`${API_URL}/auth/register`, userData, { withCredentials: true });
@@ -15,5 +15,5 @@ export const logout = async () => {
 };
 
 export const getCurrentUser = async () => {
-    return axios.get(`${API_URL}/profile`, { withCredentials: true });
+    return axios.get(`${API_URL}/user/profile`, { withCredentials: true }); // Corrected URL
 };

@@ -1,15 +1,16 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../Context/AuthContext'; 
+import { Route, Navigate } from 'react-router-dom'; // Import Navigate instead of Redirect
+import useAuth from '../Context/useAuth'; // Ensure path is correct
 
-const ProtectedRoute = () => {
-    const { user } = useAuth();
+const ProtectedRoute = ({ component: Component, ...rest }) => {
+    const { user } = useAuth(); // Using useAuth hook to get user data
 
-    if (!user) {
-        return <Navigate to="/login" />;
-    }
-
-    return <Outlet />;
+    return (
+        <Route
+            {...rest}
+            element={user ? <Component /> : <Navigate to="/login" />} // Use Navigate for redirection
+        />
+    );
 };
 
 export default ProtectedRoute;
