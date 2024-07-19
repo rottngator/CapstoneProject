@@ -8,16 +8,25 @@ const NavBar = () => {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const currentUser = await getCurrentUser();
-            setUser(currentUser);
+            try {
+                const currentUser = await getCurrentUser();
+                setUser(currentUser);
+            } catch (error) {
+                console.error('Failed to fetch user', error);
+                setUser(null); // Optionally, you might want to set some error state here
+            }
         };
 
         fetchUser();
     }, []);
 
-    const handleLogout = () => {
-        logout();
-        setUser(null);
+    const handleLogout = async () => {
+        try {
+            await logout();
+            setUser(null);
+        } catch (error) {
+            console.error('Logout failed', error);
+        }
     };
 
     return (

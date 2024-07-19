@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getCurrentUser } from '../../api/api'; 
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import axios from 'axios';
 
 const AuthContext = createContext();
 
@@ -9,8 +9,8 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const currentUser = await getCurrentUser();
-                setUser(currentUser);
+                const response = await axios.get('/api/user/profile', { withCredentials: true });
+                setUser(response.data);
             } catch (error) {
                 setUser(null);
             }
@@ -19,13 +19,15 @@ export const AuthProvider = ({ children }) => {
         fetchUser();
     }, []);
 
-    const login = (userData) => {
-        setUser(userData);
+    const login = async (username, password) => {
+        await axios.post('/api/auth/login', { username, password }, { withCredentials: true });
+        const response = await axios.get('/api/user/profile', { withCredentials: true });
+        setUser(response.data);
     };
 
-    const logout = () => {
+    const logout = async () => {
+        await axios.post('/api/auth/logout', {}, { withCredentials: true });
         setUser(null);
-        localStorage.removeItem('token');
     };
 
     return (
@@ -35,4 +37,9 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-export const useAuth = () => useContext(AuthContext);
+// Custom hook to use the auth context
+export const useAuth = () => {
+    return useContext(AuthContext);
+};
+
+export default AuthContext;

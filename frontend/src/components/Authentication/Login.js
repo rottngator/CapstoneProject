@@ -1,43 +1,32 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { login } from '../../api/api';
+import React, { useState, useContext } from 'react';
+import AuthContext from '../Context/AuthContext';
 
 const Login = () => {
-    const [credential, setCredential] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            await login(credential, password);
-            navigate('/');
-        } catch (err) {
-            setError('Login failed. Please check your credentials.');
-        }
+        await login(username, password);
     };
 
     return (
-        <div className="login-container">
-            <form onSubmit={handleSubmit}>
-                <h2>Login</h2>
-                <input
-                    type="text"
-                    placeholder="Username or Email"
-                    value={credential}
-                    onChange={(e) => setCredential(e.target.value)}
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
-                <button type="submit">Login</button>
-                {error && <p>{error}</p>}
-            </form>
-        </div>
+        <form onSubmit={handleSubmit}>
+            <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
+            />
+            <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+            />
+            <button type="submit">Login</button>
+        </form>
     );
 };
 
