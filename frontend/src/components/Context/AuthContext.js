@@ -1,31 +1,38 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getCurrentUser } from '../../api/api'; 
 
 const AuthContext = createContext();
 
-export function useAuth() {
-    return useContext(AuthContext);
-}
+export const AuthProvider = ({ children }) => {
+    const [user, setUser] = useState(null);
 
-export function AuthProvider({ children }) {
-    const [currentUser, setCurrentUser] = useState(null);
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const currentUser = await getCurrentUser();
+                setUser(currentUser);
+            } catch (error) {
+                setUser(null);
+            }
+        };
 
-    const login = (user) => {
-        setCurrentUser(user);
+        fetchUser();
+    }, []);
+
+    const login = (userData) => {
+        setUser(userData);
     };
 
     const logout = () => {
-        setCurrentUser(null);
-    };
-
-    const value = {
-        currentUser,
-        login,
-        logout,
+        setUser(null);
+        localStorage.removeItem('token');
     };
 
     return (
-        <AuthContext.Provider value={value}>
+        <AuthContext.Provider value={{ user, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
-}
+};
+
+export const useAuth = () => useContext(AuthContext);
