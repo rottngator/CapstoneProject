@@ -1,16 +1,14 @@
 import React from 'react';
-import { Route, Navigate } from 'react-router-dom'; // Import Navigate instead of Redirect
-import useAuth from '../Context/useAuth'; // Ensure path is correct
+import { Navigate } from 'react-router-dom';
 
-const ProtectedRoute = ({ component: Component, ...rest }) => {
-    const { user } = useAuth(); // Using useAuth hook to get user data
+const ProtectedRoute = ({ element: Component }) => {
+    const token = localStorage.getItem('token');
 
-    return (
-        <Route
-            {...rest}
-            element={user ? <Component /> : <Navigate to="/login" />} // Use Navigate for redirection
-        />
-    );
+    if (!token) {
+        return <Navigate to="/login" />;
+    }
+
+    return <Component />;
 };
 
 export default ProtectedRoute;

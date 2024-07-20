@@ -1,28 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getCurrentUser, logout } from '../../api/api';
 import './NavBar.css';
+
+const API_URL = 'http://localhost:3000';
 
 const NavBar = () => {
     const [user, setUser] = useState(null);
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const currentUser = await getCurrentUser();
-                setUser(currentUser);
-            } catch (error) {
-                console.error('Failed to fetch user', error);
-                setUser(null); // Optionally, you might want to set some error state here
-            }
-        };
+    const getCurrentUser = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('No token found');
+        }
 
+        const response = await fetch(`${API_URL}/user/profile`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch user');
+        }
+
+        return await response.json();
+    };
+
+    const fetchUser = async () => {
+        try {
+            const currentUser = await getCurrentUser();
+            setUser(currentUser);
+        } catch (error) {
+            console.error('Failed to fetch user', error);
+            setUser(null);
+        }
+    };
+
+    useEffect(() => {
         fetchUser();
     }, []);
 
     const handleLogout = async () => {
         try {
-            await logout();
+            localStorage.removeItem('token');
             setUser(null);
         } catch (error) {
             console.error('Logout failed', error);

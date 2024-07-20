@@ -12,7 +12,6 @@ import EventCalendar from './components/Community/EventCalendar';
 import EventDetails from './components/Community/EventDetails';
 import About from './components/Official/About';
 import Feedback from './components/Community/Feedback';
-import { AuthProvider } from './components/Context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 
 const events = [
@@ -21,9 +20,8 @@ const events = [
 ];
 
 const App = () => {
-    console.log('Rendering App component');
     return (
-        <AuthProvider>
+        <>
             <NavBar />
             <Routes>
                 <Route path="/" element={<Home />} />
@@ -37,7 +35,7 @@ const App = () => {
                 <Route path="/event/:id" element={<ProtectedRoute element={() => <EventDetails events={events} />} />} />
                 <Route path="/feedback" element={<ProtectedRoute element={Feedback} />} />
             </Routes>
-        </AuthProvider>
+        </>
     );
 };
 

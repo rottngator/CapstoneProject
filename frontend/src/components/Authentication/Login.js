@@ -1,14 +1,34 @@
-import React, { useState, useContext } from 'react';
-import AuthContext from '../Context/AuthContext';
+import React, { useState } from 'react';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const { login } = useContext(AuthContext);
+    const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await login(username, password);
+
+        try {
+            const response = await fetch('http://localhost:3000/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', 
+                body: JSON.stringify({ username, password }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Login failed');
+            }
+
+            console.log('Login successful');
+            
+        } catch (error) {
+            console.error('Login error:', error);
+            setError('Login failed. Please check your credentials.');
+        }
     };
 
     return (
@@ -26,6 +46,7 @@ const Login = () => {
                 placeholder="Password"
             />
             <button type="submit">Login</button>
+            {error && <p className="error">{error}</p>}
         </form>
     );
 };
