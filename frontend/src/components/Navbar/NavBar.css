@@ -1,96 +1,111 @@
 .navbar {
-    background-color: #0b0113; /* Dark background color */
-    color: white; /* White text color */
-    padding: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    position: relative;
+    background-color: #0b0113;
+    padding: 10px 5px;
+    height: 60px;
 }
 
 .logo {
-    display: flex;
-    align-items: center;
-}
-
-.logo img {
-    height: 120px;
-}
-
-.logo span {
-    margin-left: 10px;
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
     font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.search-container {
-    display: flex;
-    align-items: center;
-    flex: 1; /* Makes the search container take available space */
-    margin: 0 1rem; /* Adds some space on both sides */
+    color: white;
 }
 
 .search-bar {
-    padding: 0.5rem 1rem;
-    border: 1px solid #ffffff; /* White border */
-    border-radius: 5px 0 0 5px; /* Rounded corners */
-    background-color: #1a0b2e; /* Slightly lighter background color */
-    color: white; /* White text color */
+    position: absolute;
+    left: 50%;
+    margin-top: 20px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+}
+
+.search-bar input {
+    width: 300px;
+    padding: 5px 10px;
+    border-radius: 5px 0 0 5px;
+    border: 1px solid transparent; /* Default border */
+    outline: none;
     font-size: 1rem;
-    outline: none; /* Remove default focus outline */
-    width: 100%; /* Makes the input take full width */
+    transition: border-color 0.3s; /* Smooth transition effect */
 }
 
-.search-bar::placeholder {
-    color: #b0b0b0; /* Placeholder text color */
+.search-bar input:hover {
+    border-color: #ffffff; /* White border on hover */
 }
 
-.search-button {
-    padding: 0.3rem 0.8rem;
-    background-color: #1a0b2e; /* Dark button background */
-    color: white; /* White text color */
-    border: 1px solid #ffffff; /* White border */
-    border-radius: 0 5px 5px 0; /* Rounded corners */
+
+.search-bar button {
+    padding: 5px 10px;
+    border-radius: 0 5px 5px 0;
+    border: none;
+    background-color: #9998dd;
+    color: #000;
     cursor: pointer;
     font-size: 1rem;
-    font-weight: bold;
 }
 
-.search-button:hover {
-    background-color: #a469f0; /* Slightly lighter button background on hover */
+.user-section {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
 }
 
-.dropdown {
-    position: relative;
-    display: flex; /* Align items horizontally */
-    align-items: center; /* Align items vertically */
-}
-
-.profile-pic {
+.profile-picture {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     cursor: pointer;
-    margin-left: 1rem;
+    margin-right: 10px;
+    margin-top: -240px;
+    margin-left: -150px;
 }
 
-.dropdown-menu {
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
     position: absolute;
-    top: 100%;
+    background-color: #271274;
+    min-width: 150px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
     right: 0;
-    background-color: #0b0113; /* Dark background for the dropdown menu */
-    border: 1px solid #ffffff; /* White border */
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+    top: 50%;
+    margin-top: 20px;
+    border-radius: 8px;
 }
 
-.dropdown-menu a {
+.dropdown-content button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+}
+
+.dropdown-content button:hover {
+    background-color: #000000;
+}
+
+.dropdown:hover .dropdown-content {
     display: block;
-    padding: 0.5rem 1rem;
-    color: white; /* White text color */
-    text-decoration: none;
 }
 
-.dropdown-menu a:hover {
-    background-color: #1a0b2e; /* Slightly lighter background on hover */
+.login-button {
+    padding: 5px 10px;
+    border: none;
+    background-color: #ffffff;
+    color: #000;
+    cursor: pointer;
+    border-radius: 5px;
 }

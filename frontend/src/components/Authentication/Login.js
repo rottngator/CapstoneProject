@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { UserContext } from './UserContext';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const { setUser } = useContext(UserContext);
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -14,8 +18,8 @@ const Login = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include', 
                 body: JSON.stringify({ username, password }),
+                credentials: 'include',
             });
 
             if (!response.ok) {
@@ -23,11 +27,12 @@ const Login = () => {
                 throw new Error(errorData.message || 'Login failed');
             }
 
-            console.log('Login successful');
-            
+            const userData = await response.json();
+            setUser(userData);
+            navigate('/');
         } catch (error) {
             console.error('Login error:', error);
-            setError('Login failed. Please check your credentials.');
+            setError('Login failed. Please try again.');
         }
     };
 

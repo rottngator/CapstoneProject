@@ -21,27 +21,28 @@ mongoose.connect('mongodb+srv://lunruh:Abby2525!@cluster0.ntcrjfg.mongodb.net/So
     .catch(err => console.error('MongoDB connection error:', err));
 
     // the exports
-exports.DAL = {
-    createUser: async (userData) => {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(userData.password, salt);
-        const user = new User({ ...userData, password: hashedPassword });
-        return await user.save();
-    },
-
-    getUserByEmail: async (email) => {
-        return await User.findOne({ email }).exec();
-    },
-
-    getUserByUsername: async (username) => {
-        return await User.findOne({ username }).exec();
-    },
-
-    getUserById: async (userId) => {
-        return await User.findById(userId).exec();
-    },
-
-    verifyPassword: async (inputPassword, storedPassword) => {
-        return await bcrypt.compare(inputPassword, storedPassword);
-    }
+    exports.DAL = {
+        User,
+        createUser: async (userData) => {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(userData.password, salt);
+            const user = new User({ ...userData, password: hashedPassword });
+            return await user.save();
+        },
+    
+        getUserByEmail: async (email) => {
+            return await User.findOne({ email }).exec();
+        },
+    
+        getUserByUsername: async (username) => {
+            return await User.findOne({ username }).exec();
+        },
+    
+        getUserById: async (userId) => {
+            return await User.findById(userId).exec();
+        },
+    
+        verifyPassword: async (inputPassword, storedPassword) => {
+            return await bcrypt.compare(inputPassword, storedPassword);
+        }
 };

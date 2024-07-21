@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { DAL } = require('./mongoDAL');
+const { DAL } = require('./dal/mongoDAL');
 
 const app = express();
 const port = 3000;
@@ -28,27 +28,29 @@ app.use(session({
     cookie: { secure: false },
 }));
 
-// Connect to MongoDB
-mongoose.connect('mongodb+srv://lunruh:Abby2525!@cluster0.ntcrjfg.mongodb.net/SoundHub', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
-
 // Register Route
 app.post('/auth/register', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, passwordConfirmation } = req.body;
+    if (password !== passwordConfirmation) {
+        return res.status(400).json({ message: 'Passwords do not match' });
+    }
+
     try {
+        const existingUser = await DAL.getUserByUsername(username);
+        if (existingUser) {
+            return res.status(400).json({ message: 'Username already exists' });
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new DAL.User({ username, email, password: hashedPassword });
         await user.save();
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
         console.error('Registration error:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ message: 'Internal server error', details: error.message });
     }
 });
+
 
 // Login Route
 app.post('/auth/login', async (req, res) => {
