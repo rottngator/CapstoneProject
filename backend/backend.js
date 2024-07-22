@@ -15,8 +15,8 @@ const JWT_SECRET = 'nepenthe';
 
 // configuring AWS SDK
 AWS.config.update({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: 'AKIA5FTY73QQBKXBRZQR',
+    secretAccessKey: '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',
     region: 'us-east-2'
 });
 
@@ -29,7 +29,7 @@ const upload = multer({ storage });
 // Function to upload file to S3
 const uploadFileToS3 = (file) => {
     const params = {
-        Bucket: 'sound-hub-musis-storage',
+        Bucket: 'sound-hub-music-storage',
         Key: `uploads/${file.originalname}`,
         Body: file.buffer,
         ContentType: file.mimetype,
@@ -145,7 +145,7 @@ app.post('/upload', authenticateToken, upload.single('file'), async (req, res) =
     }
 });
 
-// Start server
+
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });

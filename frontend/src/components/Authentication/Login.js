@@ -11,7 +11,7 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         try {
             const response = await fetch('http://localhost:3000/auth/login', {
                 method: 'POST',
@@ -21,13 +21,14 @@ const Login = () => {
                 body: JSON.stringify({ username, password }),
                 credentials: 'include',
             });
-
+    
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Login failed');
             }
-
+    
             const userData = await response.json();
+            localStorage.setItem('token', userData.token); // storing the token in localStorage
             setUser(userData);
             navigate('/');
         } catch (error) {
@@ -35,6 +36,7 @@ const Login = () => {
             setError('Login failed. Please try again.');
         }
     };
+    
 
     return (
         <form onSubmit={handleSubmit}>
