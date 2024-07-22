@@ -1,7 +1,14 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import './Home.css';
 
 const Home = () => {
+    const navigate = useNavigate(); 
+
+    const handleCreateClick = () => {
+        navigate('/upload'); // Navigate to the MusicUpload page
+    };
+
     return (
         <div className='home-page'>
             <div className='main-content'>
@@ -38,7 +45,7 @@ const Home = () => {
                     </div>
 
                     <div className='create'>
-                        <button>Create</button>
+                        <button onClick={handleCreateClick}>Create</button> {/* Add onClick handler */}
                     </div>
                 </div>
 

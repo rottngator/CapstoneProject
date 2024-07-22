@@ -5,11 +5,39 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const AWS = require('aws-sdk');
 const { DAL } = require('./dal/mongoDAL');
 
 const app = express();
 const port = 3000;
 const JWT_SECRET = 'nepenthe';
+
+// configuring AWS SDK
+AWS.config.update({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: 'us-east-2'
+});
+
+const s3 = new AWS.S3();
+
+// Set up multer for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+// Function to upload file to S3
+const uploadFileToS3 = (file) => {
+    const params = {
+        Bucket: 'sound-hub-musis-storage',
+        Key: `uploads/${file.originalname}`,
+        Body: file.buffer,
+        ContentType: file.mimetype,
+        ACL: 'public-read' // or 'private'
+    };
+
+    return s3.upload(params).promise();
+};
 
 // CORS configuration
 app.use(cors({
@@ -50,7 +78,6 @@ app.post('/auth/register', async (req, res) => {
         res.status(500).json({ message: 'Internal server error', details: error.message });
     }
 });
-
 
 // Login Route
 app.post('/auth/login', async (req, res) => {
@@ -101,6 +128,21 @@ app.get('/user/profile', authenticateToken, async (req, res) => {
 app.post('/auth/logout', (req, res) => {
     res.cookie('token', '', { maxAge: 1 }); // Expire the cookie
     res.status(200).json({ message: 'Logout successful' });
+});
+
+// File Upload Route
+app.post('/upload', authenticateToken, upload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const result = await uploadFileToS3(req.file);
+        res.status(200).json({ fileUrl: result.Location });
+    } catch (error) {
+        console.error('File upload error:', error);
+        res.status(500).json({ message: 'Failed to upload file' });
+    }
 });
 
 // Start server

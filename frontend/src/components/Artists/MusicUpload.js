@@ -1,16 +1,75 @@
 import React, { useState } from 'react';
 import './MusicUpload.css';
 
+// MusicPlayer Component
+const MusicPlayer = ({ src }) => {
+    const [playing, setPlaying] = useState(false);
+    const audioRef = React.createRef();
+
+    const togglePlayPause = () => {
+        if (playing) {
+            audioRef.current.pause();
+        } else {
+            audioRef.current.play();
+        }
+        setPlaying(!playing);
+    };
+
+    return (
+        <div>
+            <audio ref={audioRef} src={src} />
+            <button onClick={togglePlayPause}>
+                {playing ? 'Pause' : 'Play'}
+            </button>
+        </div>
+    );
+};
+
 const MusicUpload = () => {
     const [title, setTitle] = useState('');
     const [artist, setArtist] = useState('');
     const [description, setDescription] = useState('');
     const [file, setFile] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const [fileUrl, setFileUrl] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle file upload logic here
-        console.log({ title, artist, description, file });
+
+        if (!file) {
+            alert('Please select a file to upload.');
+            return;
+        }
+
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('title', title);
+        formData.append('artist', artist);
+        formData.append('description', description);
+
+        try {
+            const response = await fetch('http://localhost:3000/upload', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, '$1')}`, // Add the token if necessary
+                },
+                body: formData,
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                setFileUrl(result.fileUrl);
+                alert('File uploaded successfully!');
+            } else {
+                alert('File upload failed.');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            alert('An error occurred while uploading.');
+        } finally {
+            setUploading(false);
+        }
     };
 
     return (
@@ -61,8 +120,16 @@ const MusicUpload = () => {
                             required
                         />
                     </div>
-                    <button type="submit" className="upload-button">Upload</button>
+                    <button type="submit" className="upload-button" disabled={uploading}>
+                        {uploading ? 'Uploading...' : 'Upload'}
+                    </button>
                 </form>
+                {fileUrl && (
+                    <div>
+                        <div>File available at: <a href={fileUrl} target="_blank" rel="noopener noreferrer">{fileUrl}</a></div>
+                        <MusicPlayer src={fileUrl} />
+                    </div>
+                )}
             </div>
         </div>
     );
