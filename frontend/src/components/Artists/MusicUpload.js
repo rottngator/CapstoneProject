@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './MusicUpload.css';
 
-// MusicPlayer Component
 const MusicPlayer = ({ src }) => {
     const [playing, setPlaying] = useState(false);
     const audioRef = React.createRef();
@@ -35,28 +34,31 @@ const MusicUpload = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         if (!file) {
             alert('Please select a file to upload.');
             return;
         }
-
+    
         setUploading(true);
         const formData = new FormData();
         formData.append('file', file);
         formData.append('title', title);
         formData.append('artist', artist);
         formData.append('description', description);
-
+    
+        const token = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, '$1');
+        console.log('Token:', token);
+    
         try {
             const response = await fetch('http://localhost:3000/upload', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, '$1')}`, // Add the token if necessary
+                    'Authorization': `Bearer ${token}`, // Ensure token is set correctly
                 },
                 body: formData,
             });
-
+    
             const result = await response.json();
             if (response.ok) {
                 setFileUrl(result.fileUrl);
@@ -71,6 +73,7 @@ const MusicUpload = () => {
             setUploading(false);
         }
     };
+    
 
     return (
         <div className="upload-page">
@@ -107,7 +110,7 @@ const MusicUpload = () => {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             required
-                        />
+                        ></textarea>
                     </div>
                     <div className="form-group">
                         <label htmlFor="file">Music File</label>
@@ -115,22 +118,22 @@ const MusicUpload = () => {
                             type="file"
                             id="file"
                             name="file"
-                            accept="audio/*"
+                            accept=".mp3,.wav,.ogg" // specify accepted file types
                             onChange={(e) => setFile(e.target.files[0])}
                             required
                         />
                     </div>
-                    <button type="submit" className="upload-button" disabled={uploading}>
+                    <button type="submit" disabled={uploading}>
                         {uploading ? 'Uploading...' : 'Upload'}
                     </button>
                 </form>
-                {fileUrl && (
-                    <div>
-                        <div>File available at: <a href={fileUrl} target="_blank" rel="noopener noreferrer">{fileUrl}</a></div>
-                        <MusicPlayer src={fileUrl} />
-                    </div>
-                )}
             </div>
+            {fileUrl && (
+                <div className="music-player-container">
+                    <h2>Music Player</h2>
+                    <MusicPlayer src={`http://localhost:3000${fileUrl}`} />
+                </div>
+            )}
         </div>
     );
 };
