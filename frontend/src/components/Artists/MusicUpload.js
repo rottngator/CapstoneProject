@@ -31,25 +31,27 @@ const MusicUpload = () => {
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [fileUrl, setFileUrl] = useState('');
+    const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         if (!file) {
-            alert('Please select a file to upload.');
+            setError('Please select a file to upload.');
             return;
         }
-    
+
         setUploading(true);
+        setError(''); // Clear any previous errors
         const formData = new FormData();
         formData.append('file', file);
         formData.append('title', title);
         formData.append('artist', artist);
         formData.append('description', description);
-    
+
         const token = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, '$1');
         console.log('Token:', token);
-    
+
         try {
             const response = await fetch('http://localhost:3000/upload', {
                 method: 'POST',
@@ -58,22 +60,26 @@ const MusicUpload = () => {
                 },
                 body: formData,
             });
-    
-            const result = await response.json();
+
             if (response.ok) {
+                const result = await response.json();
                 setFileUrl(result.fileUrl);
+                setTitle('');
+                setArtist('');
+                setDescription('');
+                setFile(null);
                 alert('File uploaded successfully!');
             } else {
-                alert('File upload failed.');
+                const result = await response.json();
+                setError(result.message || 'File upload failed.');
             }
         } catch (error) {
             console.error('Upload error:', error);
-            alert('An error occurred while uploading.');
+            setError('An error occurred while uploading.');
         } finally {
             setUploading(false);
         }
     };
-    
 
     return (
         <div className="upload-page">
@@ -127,6 +133,7 @@ const MusicUpload = () => {
                         {uploading ? 'Uploading...' : 'Upload'}
                     </button>
                 </form>
+                {error && <p className="error-message">{error}</p>}
             </div>
             {fileUrl && (
                 <div className="music-player-container">

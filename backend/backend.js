@@ -13,15 +13,6 @@ const app = express();
 const port = 3000;
 const JWT_SECRET = 'nepenthe';
 
-
-const conn = mongoose.connection;
-let gfs;
-
-conn.once('open', () => {
-    gfs = Grid(conn.db, mongoose.mongo);
-    gfs.collection('uploads');
-});
-
 // Set up multer for file uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -42,6 +33,15 @@ app.use(session({
     saveUninitialized: false,
     cookie: { secure: false },
 }));
+
+// Initialize GridFS
+const conn = mongoose.connection;
+let gfs;
+
+conn.once('open', () => {
+    gfs = Grid(conn.db, mongoose.mongo);
+    gfs.collection('uploads');
+});
 
 // Register Route
 app.post('/auth/register', async (req, res) => {
@@ -127,6 +127,10 @@ app.post('/upload', authenticateToken, upload.single('file'), (req, res) => {
         return res.status(400).json({ message: 'No file uploaded' });
     }
 
+    if (!req.file.mimetype.startsWith('audio/')) {
+        return res.status(400).json({ message: 'Only audio files are allowed' });
+    }
+
     const writeStream = gfs.createWriteStream({
         filename: req.file.originalname,
         content_type: req.file.mimetype,
@@ -142,6 +146,11 @@ app.post('/upload', authenticateToken, upload.single('file'), (req, res) => {
         res.status(200).json({ fileUrl: `/files/${file._id}` });
     });
 
+    writeStream.on('error', (error) => {
+        console.error('File upload error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    });
+
     writeStream.write(req.file.buffer);
     writeStream.end();
 });
@@ -149,7 +158,7 @@ app.post('/upload', authenticateToken, upload.single('file'), (req, res) => {
 // Route to serve files
 app.get('/files/:id', (req, res) => {
     gfs.files.findOne({ _id: mongoose.Types.ObjectId(req.params.id) }, (err, file) => {
-        if (!file || file.length === 0) {
+        if (err || !file) {
             return res.status(404).json({ message: 'No file found' });
         }
 
