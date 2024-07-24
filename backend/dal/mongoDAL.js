@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const Grid = require('gridfs-stream');
+const { GridFSBucket } = require('mongodb');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 
 // Connection string
 const mongoURI = 'mongodb+srv://lunruh:Abby2525!@cluster0.ntcrjfg.mongodb.net/SoundHub';
@@ -13,12 +12,11 @@ mongoose.connect(mongoURI, {
     .catch(err => console.error('MongoDB connection error:', err));
 
 const conn = mongoose.connection;
-let gfs;
+let bucket;
 
-// Initialize GridFS
+// Initialize GridFSBucket
 conn.once('open', () => {
-    gfs = Grid(conn.db, mongoose.mongo);
-    gfs.collection('uploads');
+    bucket = new GridFSBucket(conn.db, { bucketName: 'uploads' });
 });
 
 // User Schema
@@ -31,10 +29,10 @@ const userSchema = new mongoose.Schema({
 // User Model
 const User = mongoose.model('User', userSchema);
 
-// Export functions and GridFS instance
+// Export functions and GridFSBucket instance
 module.exports = {
     User,
-    gfs,
+    bucket,
     createUser: async (userData) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(userData.password, salt);
@@ -58,13 +56,18 @@ module.exports = {
         return await bcrypt.compare(inputPassword, storedPassword);
     },
 
-    // Function to get file by ID from GridFS
+    // Function to get file by ID from GridFSBucket
     getFileById: async (fileId) => {
-        return gfs.files.findOne({ _id: mongoose.Types.ObjectId(fileId) }).exec();
+        return new Promise((resolve, reject) => {
+            bucket.find({ _id: mongoose.Types.ObjectId(fileId) }).toArray((err, files) => {
+                if (err) return reject(err);
+                resolve(files[0]);
+            });
+        });
     },
 
-    // Function to delete file from GridFS
+    // Function to delete file from GridFSBucket
     deleteFileById: async (fileId) => {
-        return gfs.remove({ _id: mongoose.Types.ObjectId(fileId), root: 'uploads' }).exec();
+        return bucket.delete(mongoose.Types.ObjectId(fileId));
     }
 };

@@ -59,6 +59,7 @@ const MusicUpload = () => {
                     'Authorization': `Bearer ${token}`, // Ensure token is set correctly
                 },
                 body: formData,
+                credentials: 'include',
             });
 
             if (response.ok) {
