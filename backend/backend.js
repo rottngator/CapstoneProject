@@ -50,6 +50,7 @@ let bucket;
 
 conn.once('open', () => {
     bucket = new GridFSBucket(conn.db, { bucketName: 'uploads' });
+    console.log('GridFSBucket initialized');
 });
 
 // Register Route
@@ -132,6 +133,11 @@ app.post('/auth/logout', (req, res) => {
 
 // File Upload Route
 app.post('/upload', authenticateToken, upload.single('file'), (req, res) => {
+    if (!bucket) {
+        console.error('GridFSBucket not initialized');
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+
     if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
     }
@@ -150,6 +156,11 @@ app.post('/upload', authenticateToken, upload.single('file'), (req, res) => {
     });
 
     uploadStream.on('finish', (file) => {
+        console.log('Upload finished:', file);
+        if (!file) {
+            console.error('File is undefined');
+            return res.status(500).json({ message: 'File upload failed' });
+        }
         res.status(200).json({ fileUrl: `/files/${file._id}` });
     });
 
