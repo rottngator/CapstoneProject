@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from './UserContext';
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -7,6 +8,7 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
     const [error, setError] = useState('');
+    const { setUser } = useContext(UserContext);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -31,7 +33,10 @@ const Register = () => {
                 throw new Error(errorData.message || 'Registration failed');
             }
 
-            navigate('/login');
+            const userData = await response.json();
+            localStorage.setItem('token', userData.token); // storing the token in localStorage
+            setUser(userData);
+            navigate('/');
         } catch (error) {
             console.error('Registration error:', error);
             setError('Registration failed. Please try again.');
@@ -45,24 +50,28 @@ const Register = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Username"
+                required
             />
             <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email"
+                required
             />
             <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
+                required
             />
             <input
                 type="password"
                 value={passwordConfirmation}
                 onChange={(e) => setPasswordConfirmation(e.target.value)}
                 placeholder="Confirm Password"
+                required
             />
             <button type="submit">Register</button>
             {error && <p className="error">{error}</p>}

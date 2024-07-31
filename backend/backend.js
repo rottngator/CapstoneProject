@@ -54,21 +54,22 @@ app.post('/auth/register', async (req, res) => {
         return res.status(400).json({ message: 'Passwords do not match' });
     }
 
+    console.log('createUser:', createUser);
+
     try {
         const existingUser = await getUserByUsername(username);
         if (existingUser) {
             return res.status(400).json({ message: 'Username already exists' });
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new createUser({ username, email, password: hashedPassword });
-        await user.save();
+        const user = await createUser({ username, email, password });
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
         console.error('Registration error:', error);
         res.status(500).json({ message: 'Internal server error', details: error.message });
     }
 });
+
 
 // Login Route
 app.post('/auth/login', async (req, res) => {
@@ -174,8 +175,6 @@ app.post('/upload', authenticateToken, upload.single('file'), (req, res) => {
         res.status(400).json({ message: 'File buffer is missing' });
     }
 });
-
-
 
 
 // Route to serve files
