@@ -15,7 +15,7 @@ const MusicPlayer = ({ src }) => {
     };
 
     return (
-        <div>
+        <div className="music-player">
             <audio ref={audioRef} src={src} />
             <button onClick={togglePlayPause}>
                 {playing ? 'Pause' : 'Play'}
@@ -25,121 +25,104 @@ const MusicPlayer = ({ src }) => {
 };
 
 const MusicUpload = () => {
+    const [file, setFile] = useState(null);
     const [title, setTitle] = useState('');
     const [artist, setArtist] = useState('');
     const [description, setDescription] = useState('');
-    const [file, setFile] = useState(null);
-    const [uploading, setUploading] = useState(false);
-    const [fileUrl, setFileUrl] = useState('');
     const [error, setError] = useState('');
+    const [fileUrl, setFileUrl] = useState(null);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleFileChange = (event) => {
+        setFile(event.target.files[0]);
+    };
 
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+    
         if (!file) {
             setError('Please select a file to upload.');
             return;
         }
-
-        setUploading(true);
-        setError(''); // Clear any previous errors
+    
+        console.log('Submitting file:', file); // Debugging line
+    
         const formData = new FormData();
         formData.append('file', file);
         formData.append('title', title);
         formData.append('artist', artist);
         formData.append('description', description);
-
-        const token = document.cookie.replace(/(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/, '$1');
-        console.log('Token:', token);
-
+    
         try {
             const response = await fetch('http://localhost:3000/upload', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`, // Ensure token is set correctly
-                },
-                body: formData,
                 credentials: 'include',
+                body: formData,
             });
-
-            if (response.ok) {
-                const result = await response.json();
-                setFileUrl(result.fileUrl);
-                setTitle('');
-                setArtist('');
-                setDescription('');
-                setFile(null);
-                alert('File uploaded successfully!');
-            } else {
-                const result = await response.json();
-                setError(result.message || 'File upload failed.');
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Something went wrong');
             }
-        } catch (error) {
-            console.error('Upload error:', error);
-            setError('An error occurred while uploading.');
-        } finally {
-            setUploading(false);
+    
+            const data = await response.json();
+            setFileUrl(`http://localhost:3000${data.fileUrl}`);
+        } catch (err) {
+            setError(err.message);
         }
     };
+    
+    
 
     return (
-        <div className="upload-page">
-            <div className="upload-form-container">
-                <h1>Upload Music</h1>
-                <form className="upload-form" onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="title">Title</label>
-                        <input
-                            type="text"
-                            id="title"
-                            name="title"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="artist">Artist</label>
-                        <input
-                            type="text"
-                            id="artist"
-                            name="artist"
-                            value={artist}
-                            onChange={(e) => setArtist(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="description">Description</label>
-                        <textarea
-                            id="description"
-                            name="description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            required
-                        ></textarea>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="file">Music File</label>
-                        <input
-                            type="file"
-                            id="file"
-                            name="file"
-                            accept=".mp3,.wav,.ogg" // specify accepted file types
-                            onChange={(e) => setFile(e.target.files[0])}
-                            required
-                        />
-                    </div>
-                    <button type="submit" disabled={uploading}>
-                        {uploading ? 'Uploading...' : 'Upload'}
-                    </button>
-                </form>
-                {error && <p className="error-message">{error}</p>}
-            </div>
+        <div className="upload-container">
+            <form onSubmit={handleSubmit}>
+                <h2>Upload Music</h2>
+                {error && <p className="error">{error}</p>}
+                <div>
+                    <label htmlFor="title">Title</label>
+                    <input
+                        type="text"
+                        id="title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label htmlFor="artist">Artist</label>
+                    <input
+                        type="text"
+                        id="artist"
+                        value={artist}
+                        onChange={(e) => setArtist(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label htmlFor="description">Description</label>
+                    <textarea
+                        id="description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        required
+                    ></textarea>
+                </div>
+                <div>
+                    <label htmlFor="file">File</label>
+                    <input
+                        type="file"
+                        id="file"
+                        accept="audio/*"
+                        onChange={handleFileChange}
+                        required
+                    />
+                </div>
+                <button type="submit">Upload</button>
+            </form>
             {fileUrl && (
-                <div className="music-player-container">
-                    <h2>Music Player</h2>
-                    <MusicPlayer src={`http://localhost:3000${fileUrl}`} />
+                <div className="uploaded-music">
+                    <h3>Uploaded Music:</h3>
+                    <MusicPlayer src={fileUrl} />
                 </div>
             )}
         </div>

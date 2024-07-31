@@ -1,12 +1,27 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Home.css';
 
 const Home = () => {
-    const navigate = useNavigate(); 
+    const [uploads, setUploads] = useState([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchUploads = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/uploads');
+                const data = await response.json();
+                setUploads(data);
+            } catch (error) {
+                console.error('Error fetching uploads:', error);
+            }
+        };
+
+        fetchUploads();
+    }, []);
 
     const handleCreateClick = () => {
-        navigate('/upload'); // Navigate to the MusicUpload page
+        navigate('/upload');
     };
 
     return (
@@ -45,38 +60,41 @@ const Home = () => {
                     </div>
 
                     <div className='create'>
-                        <button onClick={handleCreateClick}>Create</button> {/* Add onClick handler */}
+                        <button onClick={handleCreateClick}>Create</button>
                     </div>
                 </div>
 
                 <div className='featured-tracks'>
                     <h3>Featured Tracks</h3>
-                    <div className='track'>
-                        <img src='/frontend/public/images/track.jpg' alt='featured track'/>
-                        <div className='track-info'>
-                            <h4>Track Title Here</h4>
-                            <p>Artist</p>
-                            <div className='track-details'>
-                                <div className='track-stats'>
-                                    <div>Streams</div>
-                                    <div>00</div>
+                    {uploads.map(upload => (
+                        <div key={upload._id} className='track'>
+                            <img src='/frontend/public/images/track.jpg' alt='featured track'/>
+                            <div className='track-info'>
+                                <h4>{upload.metadata.title}</h4>
+                                <p>{upload.metadata.artist}</p>
+                                <div className='track-details'>
+                                    <div className='track-stats'>
+                                        <div>Streams</div>
+                                        <div>00</div>
+                                    </div>
+                                    <div className='track-stats'>
+                                        <div>Likes</div>
+                                        <div>00</div>
+                                    </div>
+                                    <div className='track-stats'>
+                                        <div>Comments</div>
+                                        <div>00</div>
+                                    </div>
                                 </div>
-                                <div className='track-stats'>
-                                    <div>Likes</div>
-                                    <div>00</div>
-                                </div>
-                                <div className='track-stats'>
-                                    <div>Comments</div>
-                                    <div>00</div>
-                                </div>
-                            </div>
-                        </div> 
+                            </div> 
 
-                        <div className='lyrics'>
-                            <h4>Lyrics</h4>
-                            <p>text text text text...</p>
+                            <div className='lyrics'>
+                                <h4>Lyrics</h4>
+                                <p>{upload.metadata.description}</p>
+                            </div>
+                            <audio controls src={`http://localhost:3000/files/${upload._id}`}></audio>
                         </div>
-                    </div>
+                    ))}
                 </div>
 
                 <div className='sidebar-right'>

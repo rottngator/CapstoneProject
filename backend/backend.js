@@ -34,16 +34,6 @@ app.use(session({
     cookie: { secure: false },
 }));
 
-// MongoDB connection
-mongoose.connect('mongodb+srv://lunruh:Abby2525!@cluster0.ntcrjfg.mongodb.net/SoundHub', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log('MongoDB connected');
-}).catch(err => {
-    console.error('MongoDB connection error:', err);
-});
-
 // Initialize GridFSBucket
 const conn = mongoose.connection;
 let bucket;
@@ -51,6 +41,10 @@ let bucket;
 conn.once('open', () => {
     bucket = new GridFSBucket(conn.db, { bucketName: 'uploads' });
     console.log('GridFSBucket initialized');
+});
+
+conn.on('error', (err) => {
+    console.error('MongoDB connection error:', err);
 });
 
 // Register Route
@@ -133,16 +127,20 @@ app.post('/auth/logout', (req, res) => {
 
 // File Upload Route
 app.post('/upload', authenticateToken, upload.single('file'), (req, res) => {
+    console.log('File details:', req.file);
+
     if (!bucket) {
         console.error('GridFSBucket not initialized');
         return res.status(500).json({ message: 'Internal server error' });
     }
 
     if (!req.file) {
+        console.error('No file uploaded');
         return res.status(400).json({ message: 'No file uploaded' });
     }
 
     if (!req.file.mimetype.startsWith('audio/')) {
+        console.error('Invalid file type');
         return res.status(400).json({ message: 'Only audio files are allowed' });
     }
 
@@ -157,8 +155,8 @@ app.post('/upload', authenticateToken, upload.single('file'), (req, res) => {
 
     uploadStream.on('finish', (file) => {
         console.log('Upload finished:', file);
-        if (!file) {
-            console.error('File is undefined');
+        if (!file || !file._id) {
+            console.error('File is undefined or missing ID');
             return res.status(500).json({ message: 'File upload failed' });
         }
         res.status(200).json({ fileUrl: `/files/${file._id}` });
@@ -169,12 +167,20 @@ app.post('/upload', authenticateToken, upload.single('file'), (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     });
 
-    uploadStream.end(req.file.buffer);
+    if (req.file.buffer) {
+        uploadStream.end(req.file.buffer);
+    } else {
+        console.error('File buffer is missing');
+        res.status(400).json({ message: 'File buffer is missing' });
+    }
 });
+
+
+
 
 // Route to serve files
 app.get('/files/:id', (req, res) => {
-    const fileId = mongoose.Types.ObjectId(req.params.id);
+    const fileId = new mongoose.Types.ObjectId(req.params.id); // Use 'new' here
     const downloadStream = bucket.openDownloadStream(fileId);
 
     downloadStream.on('data', (chunk) => {
@@ -189,6 +195,21 @@ app.get('/files/:id', (req, res) => {
         console.error('File download error:', error);
         res.status(404).json({ message: 'No file found' });
     });
+});
+
+
+// Route to fetch uploaded files metadata
+app.get('/uploads', async (req, res) => {
+    try {
+        if (!bucket) {
+            return res.status(500).json({ message: 'Internal server error' });
+        }
+        const files = await bucket.find().toArray();
+        res.status(200).json(files);
+    } catch (error) {
+        console.error('Fetching uploads error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
 });
 
 // Route to delete files
