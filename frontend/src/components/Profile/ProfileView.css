@@ -1,109 +1,84 @@
 .profile-container {
+    width: 100%;
+    max-width: 800px;
+    margin: auto;
     font-family: Arial, sans-serif;
-    color: #fff;
-    background-color: #1a1a2e;
-    padding: 20px;
 }
 
 .profile-header {
     position: relative;
-    text-align: center;
-    margin-bottom: 20px;
 }
 
 .background-image {
     width: 100%;
-    height: 300px; /* Adjust height as needed */
-    background: url('https://i.pinimg.com/564x/e8/31/5f/e8315f00e84b1187c1adc18bb7ca3c23.jpg') no-repeat center center;
+    height: 200px;
     background-size: cover;
-    border-radius: 10px;
+    background-position: center;
 }
 
 .profile-picture {
-    position: absolute;
-    top: 220px;
-    left: 20px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
     overflow: hidden;
-    border: 3px solid #fff;
+    position: absolute;
+    bottom: -75px;
+    left: 20px;
+    border: 5px solid white;
 }
 
 .profile-picture img {
-    width: 150px;
-    height: 150px;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+}
+
+.about-section {
+    margin-top: 100px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .profile-content {
     display: flex;
-    flex-direction: column;
-}
-
-.about-section {
-    margin-top: 60px;
-    margin-left: 250px;
-    margin-right: 750px;
-    padding: 10px;
-    background-color: #2e2e3a;
-    border-radius: 10px;
+    justify-content: space-between;
+    padding: 20px;
 }
 
 .profile-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-top: -70px;
-    margin-left: 20px;
-    position: relative;
-    z-index: 1;
+    flex: 1;
+    margin-right: 20px;
 }
 
-.profile-info h1 {
-    font-size: 2em;
-    margin: 0;
-}
-
-.profile-info h2 {
-    font-size: 1.5em;
-    margin: 5px 0;
-}
-
-.profile-info p {
-    margin: 5px 0;
+.profile-details {
+    flex: 2;
 }
 
 .follow-info {
     display: flex;
-    gap: 20px;
+    justify-content: space-around;
     margin-top: 10px;
 }
 
-.profile-details {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    margin-top: 20px;
-    margin-left: 20px;
+.follow-info div {
+    text-align: center;
+    font-size: 14px;
 }
 
 .bio-section, .tracks-section {
-    width: 45%; /* Adjust width as needed */
-    margin: 10px 0;
+    margin-top: 20px;
 }
 
-.bio-section h2, .tracks-section h2, .about-section h2 {
-    font-size: 1.5em;
+.tracks-section .track {
+    display: flex;
+    align-items: center;
     margin-bottom: 10px;
 }
 
-.track {
-    display: flex;
-    align-items: center;
-}
-
-.track img {
+.tracks-section .track img {
     width: 50px;
     height: 50px;
     margin-right: 10px;
-    border-radius: 5px;
 }

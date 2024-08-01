@@ -120,6 +120,21 @@ app.get('/user/profile', authenticateToken, async (req, res) => {
     }
 });
 
+app.put('/user/profile', authenticateToken, async (req, res) => {
+    try {
+        const updatedUser = await updateUserById(req.user.userId, req.body);
+        if (updatedUser) {
+            res.status(200).json(updatedUser);
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        console.error('Profile update error:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 // Logout Route
 app.post('/auth/logout', (req, res) => {
     res.cookie('token', '', { maxAge: 1 });

@@ -4,6 +4,7 @@ import NavBar from './components/Navbar/NavBar';
 import Home from './components/Home/Home';
 import ProfileView from './components/Profile/ProfileView';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import MusicUpload from './components/Artists/MusicUpload';
 import Register from './components/Authentication/Register';
 import Login from './components/Authentication/Login';
@@ -14,6 +15,7 @@ import About from './components/Official/About';
 import Feedback from './components/Community/Feedback';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { UserProvider } from './components/Authentication/UserContext';
+import EditProfile from './components/Profile/EditProfile';
 
 const events = [
     { id: 1, date: new Date(2024, 6, 10), title: 'Event 1', description: 'Description 1', location: 'Location 1', time: '10:00 AM' },
@@ -31,6 +33,7 @@ const App = () => {
                     <Route path="/login" element={<Login />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/profile" element={<ProtectedRoute element={ProfileView} />} />
+                    <Route path='/edit' element={<ProtectedRoute element={EditProfile} />} />
                     <Route path="/upload" element={<ProtectedRoute element={MusicUpload} />} />
                     <Route path="/chat" element={<ProtectedRoute element={CommunityChat} />} />
                     <Route path="/calendar" element={<ProtectedRoute element={EventCalendar} />} />

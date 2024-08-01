@@ -1,37 +1,67 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import './ProfileView.css';
 
 const ProfileView = () => {
+    const [profileData, setProfileData] = useState({
+        profilePicture: '',
+        banner: '',
+        about: '',
+        pronouns: '',
+        location: '',
+        label: '',
+        name: '',
+        username: '',
+    });
+
+    useEffect(() => {
+        const fetchProfileData = async () => {
+            const response = await fetch('http://localhost:3000/user/profile', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            const data = await response.json();
+            setProfileData(data);
+        };
+
+        fetchProfileData();
+    }, []);
+
     return (
-        <div className="profile-container">
+        <div className="container profile-container">
             <div className="profile-header">
-                <div className="background-image"></div>
+                <div
+                    className="background-image"
+                    style={{ backgroundImage: `url(${profileData.banner})` }}
+                ></div>
                 <div className="profile-picture">
-                    <img src="/images/jensen1.jpg" alt="Profile" />
+                    <img src={profileData.profilePicture} alt="Profile" className="rounded-circle" />
                 </div>
             </div>
-            <div className="about-section">
+            <div className="about-section mt-3">
                 <h2>ABOUT</h2>
-                <p>text text text text text text text text text text text text text text 
-                    text text text text text text text text text text text text text text text</p>
+                <p>{profileData.about}</p>
             </div>
-            <div className="profile-content">
-                <div className="profile-info">
-                    <h1>NAMENAME</h1>
-                    <h2>@USERNAME</h2>
-                    <p>Artist / Fan / Producer</p>
-                    <p>links i don't want to get icons</p>
+            <div className="profile-content row">
+                <div className="profile-info col-md-4">
+                    <h1>{profileData.name}</h1>
+                    <h2>@{profileData.username}</h2>
+                    <p>{profileData.label}</p>
+                    <p>Links: <a href="#link">Link 1</a>, <a href="#link">Link 2</a></p>
                     <div className="follow-info">
                         <div>Following<br />00</div>
                         <div>Followers<br />00</div>
                     </div>
                 </div>
-                <div className="profile-details">
+                <div className="profile-details col-md-8">
                     <div className="bio-section">
                         <h2>BIO</h2>
-                        <p>PRONOUNS:</p>
-                        <p>LOCATION:</p>
-                        <p>LABEL:</p>
+                        <p>PRONOUNS: {profileData.pronouns}</p>
+                        <p>LOCATION: {profileData.location}</p>
+                        <p>LABEL: {profileData.label}</p>
                     </div>
                     <div className="tracks-section">
                         <h2>TRACKS</h2>

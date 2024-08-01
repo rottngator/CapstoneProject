@@ -23,7 +23,14 @@ conn.once('open', () => {
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true }
+    password: { type: String, required: true },
+    profilePicture: { type: String },
+    banner: { type: String },
+    about: { type: String },
+    pronouns: { type: String },
+    location: { type: String },
+    label: { type: String },
+    name: { type: String }
 });
 
 // User Model
@@ -69,5 +76,20 @@ module.exports = {
     // Function to delete file from GridFSBucket
     deleteFileById: async (fileId) => {
         return bucket.delete(mongoose.Types.ObjectId(fileId));
+    },
+
+    // Function to update user by ID
+    updateUserById: async (userId, updateData) => {
+        try {
+            const updatedUser = await User.findByIdAndUpdate(
+                mongoose.Types.ObjectId(userId),
+                { $set: updateData },
+                { new: true }
+            );
+            return updatedUser;
+        } catch (error) {
+            console.error('Error updating user:', error);
+            throw error;
+        }
     }
 };

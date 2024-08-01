@@ -29,7 +29,7 @@ const NavBar = () => {
                         <img src={user.profilePicture} alt="Profile" className="profile-picture" />
                         <div className="dropdown-content">
                             <button onClick={() => navigate('/profile')}>Profile</button>
-                            <button onClick={() => navigate('/settings')}>Settings</button>
+                            <button onClick={() => navigate('/edit')}>Edit Profile</button>
                             <button onClick={handleLogout}>Logout</button>
                         </div>
                     </div>
