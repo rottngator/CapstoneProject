@@ -17,6 +17,7 @@ let bucket;
 // Initialize GridFSBucket
 conn.once('open', () => {
     bucket = new GridFSBucket(conn.db, { bucketName: 'uploads' });
+    console.log('GridFSBucket initialized');
 });
 
 // User Schema
@@ -33,17 +34,52 @@ const userSchema = new mongoose.Schema({
     name: { type: String }
 });
 
+const trackSchema = new mongoose.Schema({
+    title: String,
+    artist: String,
+    description: String,
+    user: mongoose.Schema.Types.ObjectId,
+    isFeatured: { type: Boolean, default: false },
+    createdAt: { type: Date, default: Date.now },
+});
+
 // User Model
 const User = mongoose.model('User', userSchema);
+const Track = mongoose.model('Track', trackSchema);
+
+// Function to update user by ID
+const updateUserById = async (userId, updates) => {
+    try {
+        const updatedUser = await User.findByIdAndUpdate(userId, updates, { new: true });
+        if (!updatedUser) throw new Error('User not found');
+        return updatedUser;
+    } catch (error) {
+        console.error('Error updating user:', error);
+        throw error;
+    }
+};
+
 
 // Export functions and GridFSBucket instance
 module.exports = {
     User,
     bucket,
+    Track,
     createUser: async (userData) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(userData.password, salt);
-        const user = new User({ ...userData, password: hashedPassword });
+        const user = new User({
+            username: userData.username,
+            email: userData.email,
+            password: hashedPassword,
+            profilePicture: userData.profilePicture || '',
+            banner: userData.banner || '',
+            about: userData.about || '',
+            pronouns: userData.pronouns || '',
+            location: userData.location || '',
+            label: userData.label || '',
+            name: userData.name || ''
+        });
         return await user.save();
     },
 
@@ -77,19 +113,5 @@ module.exports = {
     deleteFileById: async (fileId) => {
         return bucket.delete(mongoose.Types.ObjectId(fileId));
     },
-
-    // Function to update user by ID
-    updateUserById: async (userId, updateData) => {
-        try {
-            const updatedUser = await User.findByIdAndUpdate(
-                mongoose.Types.ObjectId(userId),
-                { $set: updateData },
-                { new: true }
-            );
-            return updatedUser;
-        } catch (error) {
-            console.error('Error updating user:', error);
-            throw error;
-        }
-    }
+    updateUserById
 };

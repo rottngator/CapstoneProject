@@ -1,136 +1,177 @@
 import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate } from 'react-router-dom';
 
 const EditProfile = () => {
-    const [profileData, setProfileData] = useState({
-        profilePicture: '',
-        banner: '',
+    const [profile, setProfile] = useState({
+        username: '',
+        email: '',
         about: '',
         pronouns: '',
         location: '',
         label: '',
         name: '',
+        profilePicture: null,
+        banner: null,
     });
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchProfileData = async () => {
-            const response = await fetch('http://localhost:3000/user/profile', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-            const data = await response.json();
-            setProfileData(data);
+        // Fetch the current profile data from the server
+        const fetchProfile = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('http://localhost:3000/user/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    setProfile(data);
+                } else {
+                    console.error('Failed to fetch profile');
+                    setError('Failed to fetch profile');
+                }
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+                setError('Error fetching profile');
+            }
         };
 
-        fetchProfileData();
+        fetchProfile();
     }, []);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setProfileData({ ...profileData, [name]: value });
+        const { name, value, files } = e.target;
+        setProfile((prevProfile) => ({
+            ...prevProfile,
+            [name]: files ? files[0] : value,
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const response = await fetch('http://localhost:3000/user/profile', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-            },
-            body: JSON.stringify(profileData),
-        });
-
-        if (response.ok) {
-            console.log('Profile updated successfully');
-        } else {
-            console.error('Failed to update profile');
+        
+        try {
+            const token = localStorage.getItem('token');
+            
+            const formData = new FormData();
+            for (const key in profile) {
+                if (profile[key] !== null) {
+                    formData.append(key, profile[key]);
+                }
+            }
+            
+            const response = await fetch('http://localhost:3000/user/profile', {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData,
+                credentials: 'include'
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to update profile');
+            }
+    
+            const result = await response.json();
+            console.log(result.message);
+            // Handle successful profile update
+        } catch (error) {
+            console.error('Failed to update profile:', error);
+            setError('Failed to update profile');
         }
     };
 
     return (
-        <div className="container">
-            <form onSubmit={handleSubmit} className="mt-3">
-                <div className="mb-3">
-                    <label htmlFor="profilePicture" className="form-label">Profile Picture URL:</label>
+        <div>
+            <h2>Edit Profile</h2>
+            {error && <p>{error}</p>}
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label>Username:</label>
                     <input
                         type="text"
-                        className="form-control"
-                        id="profilePicture"
-                        name="profilePicture"
-                        value={profileData.profilePicture}
+                        name="username"
+                        value={profile.username}
                         onChange={handleChange}
                     />
                 </div>
-                <div className="mb-3">
-                    <label htmlFor="banner" className="form-label">Banner URL:</label>
+                <div>
+                    <label>Email:</label>
                     <input
-                        type="text"
-                        className="form-control"
-                        id="banner"
-                        name="banner"
-                        value={profileData.banner}
+                        type="email"
+                        name="email"
+                        value={profile.email}
                         onChange={handleChange}
                     />
                 </div>
-                <div className="mb-3">
-                    <label htmlFor="about" className="form-label">About:</label>
-                    <textarea
-                        className="form-control"
-                        id="about"
+                <div>
+                    <label>About:</label>
+                    <input
+                        type="text"
                         name="about"
-                        value={profileData.about}
+                        value={profile.about}
                         onChange={handleChange}
-                    ></textarea>
+                    />
                 </div>
-                <div className="mb-3">
-                    <label htmlFor="pronouns" className="form-label">Pronouns:</label>
+                <div>
+                    <label>Pronouns:</label>
                     <input
                         type="text"
-                        className="form-control"
-                        id="pronouns"
                         name="pronouns"
-                        value={profileData.pronouns}
+                        value={profile.pronouns}
                         onChange={handleChange}
                     />
                 </div>
-                <div className="mb-3">
-                    <label htmlFor="location" className="form-label">Location:</label>
+                <div>
+                    <label>Location:</label>
                     <input
                         type="text"
-                        className="form-control"
-                        id="location"
                         name="location"
-                        value={profileData.location}
+                        value={profile.location}
                         onChange={handleChange}
                     />
                 </div>
-                <div className="mb-3">
-                    <label htmlFor="label" className="form-label">Label:</label>
+                <div>
+                    <label>Label:</label>
                     <input
                         type="text"
-                        className="form-control"
-                        id="label"
                         name="label"
-                        value={profileData.label}
+                        value={profile.label}
                         onChange={handleChange}
                     />
                 </div>
-                <div className="mb-3">
-                    <label htmlFor="name" className="form-label">Name:</label>
+                <div>
+                    <label>Name:</label>
                     <input
                         type="text"
-                        className="form-control"
-                        id="name"
                         name="name"
-                        value={profileData.name}
+                        value={profile.name}
                         onChange={handleChange}
                     />
                 </div>
-                <button type="submit" className="btn btn-primary">Save Changes</button>
+                <div>
+                    <label>Profile Picture:</label>
+                    <input
+                        type="file"
+                        name="profilePicture"
+                        onChange={handleChange}
+                    />
+                </div>
+                <div>
+                    <label>Banner:</label>
+                    <input
+                        type="file"
+                        name="banner"
+                        onChange={handleChange}
+                    />
+                </div>
+                <button type="submit">Save</button>
             </form>
         </div>
     );

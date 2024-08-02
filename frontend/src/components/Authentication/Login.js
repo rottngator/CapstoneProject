@@ -19,7 +19,7 @@ const Login = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, password }),
-                credentials: 'include',
+                credentials: 'include', // Ensure cookies are included
             });
     
             if (!response.ok) {
@@ -27,9 +27,9 @@ const Login = () => {
                 throw new Error(errorData.message || 'Login failed');
             }
     
-            const userData = await response.json();
-            localStorage.setItem('token', userData.token); // storing the token in localStorage
-            setUser(userData);
+            const { token } = await response.json();
+            localStorage.setItem('token', token); // Store token in localStorage
+            setUser({ token }); // Assuming setUser expects user data with token
             navigate('/');
         } catch (error) {
             console.error('Login error:', error);
@@ -37,6 +37,7 @@ const Login = () => {
         }
     };
     
+
 
     return (
         <form onSubmit={handleSubmit}>
