@@ -1,10 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import './EventDetails.css';
 
 const EventDetails = ({ events }) => {
     const { id } = useParams();
-    const event = events.find(event => event.id === parseInt(id));
+    const [event, setEvent] = useState(events.find(event => event.id === parseInt(id)));
+    const [isRSVPd, setIsRSVPd] = useState(false);
+
+    const handleRSVP = async () => {
+        try {
+            const response = await fetch(`http://localhost:3000/events/${id}/rsvp`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId: 'currentUserId' }), // replace with actual user ID
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to RSVP');
+            }
+
+            setIsRSVPd(true);
+        } catch (error) {
+            console.error('Error RSVPing:', error);
+        }
+    };
 
     if (!event) {
         return <div>Event not found</div>;
@@ -17,6 +37,9 @@ const EventDetails = ({ events }) => {
             <p>Description: {event.description}</p>
             <p>Location: {event.location}</p>
             <p>Time: {event.time}</p>
+            <button onClick={handleRSVP} disabled={isRSVPd}>
+                {isRSVPd ? 'RSVP’d' : 'RSVP'}
+            </button>
         </div>
     );
 };

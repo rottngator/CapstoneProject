@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import AddEvent from './AddEvent'; // Import the AddEvent component
 import './EventCalendar.css';
 
 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -10,6 +11,11 @@ const EventCalendar = () => {
         { id: 1, date: new Date(2024, 6, 10), title: 'Event 1', description: 'Description 1', location: 'Location 1', time: '10:00 AM' },
         { id: 2, date: new Date(2024, 6, 15), title: 'Event 2', description: 'Description 2', location: 'Location 2', time: '2:00 PM' },
     ]);
+    const [showAddEvent, setShowAddEvent] = useState(false);
+
+    const handleAddEvent = (event) => {
+        setEvents((prevEvents) => [...prevEvents, event]);
+    };
 
     const renderHeader = () => {
         const dateFormat = { month: 'long', year: 'numeric' };
@@ -21,6 +27,9 @@ const EventCalendar = () => {
                 <div className="current-month">{currentDate.toLocaleDateString(undefined, dateFormat)}</div>
                 <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() + 1)))}>
                     Next
+                </button>
+                <button onClick={() => setShowAddEvent(!showAddEvent)}>
+                    {showAddEvent ? 'Close Form' : 'Add Event'}
                 </button>
             </div>
         );
@@ -84,6 +93,7 @@ const EventCalendar = () => {
             {renderHeader()}
             {renderDaysOfWeek()}
             {renderCells()}
+            {showAddEvent && <AddEvent onAdd={handleAddEvent} />}
         </div>
     );
 };
