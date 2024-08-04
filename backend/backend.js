@@ -5,16 +5,12 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const multer = require('multer');
 const { createUser, getUserByUsername, getUserById, verifyPassword, getFileById, deleteFileById, updateUserById, Track } = require('./dal/mongoDAL');
 const { GridFSBucket } = require('mongodb');
+const { uploadImage, uploadMusic } = require('./multerUpload'); // Import the updated multer configuration
 const app = express();
 const port = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'nepenthe';
-
-// Set up multer for file uploads
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
 
 // CORS configuration
 app.use(cors({
@@ -72,7 +68,6 @@ app.post('/auth/login', async (req, res) => {
     }
 });
 
-
 // Middleware to protect routes
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -89,7 +84,7 @@ const authenticateToken = (req, res, next) => {
 // Profile Route
 app.get('/user/profile', authenticateToken, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user.userId);
         if (!user) return res.status(404).json({ message: 'User not found' });
         res.json(user);
     } catch (err) {
@@ -97,10 +92,10 @@ app.get('/user/profile', authenticateToken, async (req, res) => {
     }
 });
 
-// update route for the profile
-app.put('/user/profile', authenticateToken, upload.fields([{ name: 'profilePicture' }, { name: 'banner' }]), async (req, res) => {
+// Update route for the profile
+app.put('/user/profile', authenticateToken, uploadImage.fields([{ name: 'profilePicture' }, { name: 'banner' }]), async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user.userId);
         if (!user) return res.status(404).json({ message: 'User not found' });
 
         const updates = {};
@@ -111,14 +106,14 @@ app.put('/user/profile', authenticateToken, upload.fields([{ name: 'profilePictu
         // Handle file uploads separately
         if (req.files) {
             if (req.files.profilePicture) {
-                updates.profilePicture = req.files.profilePicture[0].buffer;
+                updates.profilePicture = req.files.profilePicture[0].filename;
             }
             if (req.files.banner) {
-                updates.banner = req.files.banner[0].buffer;
+                updates.banner = req.files.banner[0].filename;
             }
         }
 
-        await User.findByIdAndUpdate(req.user.id, updates, { new: true });
+        await User.findByIdAndUpdate(req.user.userId, updates, { new: true });
         res.json({ message: 'Profile updated successfully' });
     } catch (err) {
         res.status(500).json({ message: 'Server error' });
@@ -131,8 +126,8 @@ app.post('/auth/logout', (req, res) => {
     res.status(200).json({ message: 'Logout successful' });
 });
 
-// File Upload Route
-app.post('/upload', authenticateToken, upload.single('file'), (req, res) => {
+// Music File Upload Route
+app.post('/upload', authenticateToken, uploadMusic.single('file'), (req, res) => {
     if (!bucket) {
         return res.status(500).json({ message: 'Internal server error' });
     }
