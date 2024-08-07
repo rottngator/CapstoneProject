@@ -16,38 +16,32 @@ const ProfileView = () => {
 
     useEffect(() => {
         const fetchProfileData = async () => {
-            const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:3000/user/profile', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-    
-            if (!response.ok) {
-                console.error('Failed to fetch profile data:', response.statusText);
-                return;
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('http://localhost:3000/user/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+        
+                if (!response.ok) {
+                    console.error('Failed to fetch profile data:', response.statusText);
+                    return;
+                }
+        
+                const data = await response.json();
+                setProfileData(data); // Directly set the data object
+                console.log(data);  // Log the fetched data
+            } catch (error) {
+                console.error('Failed to fetch profile data:', error.message);
             }
-    
-            const data = await response.json();
-            setProfileData({
-                profilePicture: data.profilePicture,
-                banner: data.banner,
-                about: data.about,
-                pronouns: data.pronouns,
-                location: data.location,
-                label: data.label,
-                name: data.name,
-                username: data.username,
-            });
-            console.log(data);  // Log the fetched data
         };
     
         fetchProfileData();
     }, []);
     
-
     return (
         <div className="container profile-container">
             <div className="profile-header">

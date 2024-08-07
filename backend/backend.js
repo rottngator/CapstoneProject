@@ -6,7 +6,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { createUser, getUserByUsername, getUserById, updateUserById, Track } = require('./dal/mongoDAL');
-const { GridFSBucket } = require('mongodb');
 const { uploadImage, uploadMusic } = require('./multerUpload'); // Import the updated multer configuration
 const app = express();
 const port = process.env.PORT || 3000;
@@ -25,7 +24,7 @@ app.use(cookieParser());
 app.use(session({
     secret: process.env.SESSION_SECRET || 'the_night_does_not_belong_to_god',
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: { secure: false },
 }));
 
@@ -42,10 +41,10 @@ app.post('/auth/register', async (req, res) => {
             return res.status(400).json({ message: 'Username already exists' });
         }
 
-        const user = await createUser({ username, email, password });
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await createUser({ username, email, password: hashedPassword });
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        console.error('Registration error:', error);
         res.status(500).json({ message: 'Internal server error', details: error.message });
     }
 });
@@ -58,12 +57,11 @@ app.post('/auth/login', async (req, res) => {
         if (user && await bcrypt.compare(password, user.password)) {
             const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
             res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'lax' });
-            res.status(200).json({ token }); // Return the token directly
+            res.status(200).json({ token });
         } else {
             res.status(401).json({ message: 'Invalid credentials' });
         }
     } catch (error) {
-        console.error('Login error:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
@@ -119,16 +117,8 @@ app.post('/auth/logout', (req, res) => {
 
 // Music File Upload Route
 app.post('/upload', authenticateToken, uploadMusic.single('file'), (req, res) => {
-    if (!bucket) {
-        return res.status(500).json({ message: 'Internal server error' });
-    }
-
     if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
-    }
-
-    if (!req.file.mimetype.startsWith('audio/')) {
-        return res.status(400).json({ message: 'Only audio files are allowed' });
     }
 
     const uploadStream = bucket.openUploadStream(req.file.originalname, {
@@ -172,9 +162,6 @@ app.get('/files/:id', (req, res) => {
 // Route to fetch uploaded files metadata
 app.get('/uploads', async (req, res) => {
     try {
-        if (!bucket) {
-            return res.status(500).json({ message: 'Internal server error' });
-        }
         const files = await bucket.find().toArray();
         res.status(200).json(files);
     } catch (error) {
@@ -195,11 +182,9 @@ app.delete('/files/:id', authenticateToken, async (req, res) => {
 // Route to feature a track
 app.put('/tracks/feature/:id', authenticateToken, async (req, res) => {
     const trackId = req.params.id;
-
     try {
         await Track.updateMany({}, { $set: { isFeatured: false } });
         const updatedTrack = await Track.findByIdAndUpdate(trackId, { isFeatured: true }, { new: true });
-
         if (updatedTrack) {
             res.status(200).json({ message: 'Track featured successfully' });
         } else {
@@ -214,7 +199,6 @@ app.put('/tracks/feature/:id', authenticateToken, async (req, res) => {
 app.get('/tracks/featured', async (req, res) => {
     try {
         const featuredTrack = await Track.findOne({ isFeatured: true }).sort({ createdAt: -1 });
-
         if (featuredTrack) {
             res.status(200).json(featuredTrack);
         } else {
