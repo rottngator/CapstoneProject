@@ -8,19 +8,16 @@ mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error('MongoDB connection error:', err));
+    .then(() => {
+        console.log('MongoDB connection established successfully.');
+        // Initialize bucket after successful connection
+        bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+            bucketName: 'tracks'
+        });
+    })
+    .catch((err) => console.error('Failed to connect to MongoDB:', err));
 
-const conn = mongoose.connection;
-let bucket;
-
-// Initialize GridFSBucket
-conn.once('open', () => {
-    bucket = new GridFSBucket(conn.db, { bucketName: 'uploads' });
-    console.log('GridFSBucket initialized');
-});
-
-// User Schema
+// User schema
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -31,87 +28,46 @@ const userSchema = new mongoose.Schema({
     pronouns: { type: String },
     location: { type: String },
     label: { type: String },
-    name: { type: String }
+    name: { type: String },
 });
 
-const trackSchema = new mongoose.Schema({
-    title: String,
-    artist: String,
-    description: String,
-    user: mongoose.Schema.Types.ObjectId,
-    isFeatured: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now },
-});
-
-// User Model
 const User = mongoose.model('User', userSchema);
+
+// Track schema
+const trackSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    artist: { type: String, required: true },
+    description: { type: String },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    isFeatured: { type: Boolean, default: false }
+}, {
+    timestamps: true
+});
+
 const Track = mongoose.model('Track', trackSchema);
 
-// Function to update user by ID
-const updateUserById = async (userId, updates) => {
-    try {
-        const updatedUser = await User.findByIdAndUpdate(userId, updates, { new: true });
-        if (!updatedUser) throw new Error('User not found');
-        return updatedUser;
-    } catch (error) {
-        console.error('Error updating user:', error);
-        throw error;
-    }
+const createUser = async ({ username, email, password }) => {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ username, email, password: hashedPassword });
+    return await user.save();
 };
 
+const getUserByUsername = async (username) => {
+    return await User.findOne({ username });
+};
 
-// Export functions and GridFSBucket instance
+const getUserById = async (id) => {
+    return await User.findById(id);
+};
+
+const updateUserById = async (id, updates) => {
+    return await User.findByIdAndUpdate(id, updates, { new: true });
+};
+
 module.exports = {
-    User,
-    bucket,
-    Track,
-    createUser: async (userData) => {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(userData.password, salt);
-        const user = new User({
-            username: userData.username,
-            email: userData.email,
-            password: hashedPassword,
-            profilePicture: userData.profilePicture || '',
-            banner: userData.banner || '',
-            about: userData.about || '',
-            pronouns: userData.pronouns || '',
-            location: userData.location || '',
-            label: userData.label || '',
-            name: userData.name || ''
-        });
-        return await user.save();
-    },
-
-    getUserByEmail: async (email) => {
-        return await User.findOne({ email }).exec();
-    },
-
-    getUserByUsername: async (username) => {
-        return await User.findOne({ username }).exec();
-    },
-
-    getUserById: async (userId) => {
-        return await User.findById(userId).exec();
-    },
-
-    verifyPassword: async (inputPassword, storedPassword) => {
-        return await bcrypt.compare(inputPassword, storedPassword);
-    },
-
-    // Function to get file by ID from GridFSBucket
-    getFileById: async (fileId) => {
-        return new Promise((resolve, reject) => {
-            bucket.find({ _id: mongoose.Types.ObjectId(fileId) }).toArray((err, files) => {
-                if (err) return reject(err);
-                resolve(files[0]);
-            });
-        });
-    },
-
-    // Function to delete file from GridFSBucket
-    deleteFileById: async (fileId) => {
-        return bucket.delete(mongoose.Types.ObjectId(fileId));
-    },
-    updateUserById
+    createUser,
+    getUserByUsername,
+    getUserById,
+    updateUserById,
+    Track
 };

@@ -21,22 +21,32 @@ const ProfileView = () => {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`, // Make sure token is valid
+                    'Authorization': `Bearer ${token}`,
                 },
             });
-        
+    
             if (!response.ok) {
                 console.error('Failed to fetch profile data:', response.statusText);
                 return;
             }
-        
+    
             const data = await response.json();
-            setProfileData(data);
+            setProfileData({
+                profilePicture: data.profilePicture,
+                banner: data.banner,
+                about: data.about,
+                pronouns: data.pronouns,
+                location: data.location,
+                label: data.label,
+                name: data.name,
+                username: data.username,
+            });
+            console.log(data);  // Log the fetched data
         };
-        
-
+    
         fetchProfileData();
     }, []);
+    
 
     return (
         <div className="container profile-container">

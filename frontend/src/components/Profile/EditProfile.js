@@ -17,7 +17,6 @@ const EditProfile = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Fetch the current profile data from the server
         const fetchProfile = async () => {
             try {
                 const token = localStorage.getItem('token');
@@ -53,127 +52,100 @@ const EditProfile = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         try {
             const token = localStorage.getItem('token');
-            
             const formData = new FormData();
+
             for (const key in profile) {
-                if (profile[key] !== null) {
-                    formData.append(key, profile[key]);
-                }
+                formData.append(key, profile[key]);
             }
-            
+
             const response = await fetch('http://localhost:3000/user/profile', {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: formData,
-                credentials: 'include'
             });
-    
+
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to update profile');
+                throw new Error(errorData.message || 'Profile update failed');
             }
-    
-            const result = await response.json();
-            console.log(result.message);
-            // Handle successful profile update
+
+            const data = await response.json();
+            setProfile(data);
+            navigate('/profile');
         } catch (error) {
-            console.error('Failed to update profile:', error);
-            setError('Failed to update profile');
+            console.error('Profile update error:', error);
+            setError('Profile update failed. Please try again.');
         }
     };
 
     return (
-        <div>
-            <h2>Edit Profile</h2>
-            {error && <p>{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Username:</label>
-                    <input
-                        type="text"
-                        name="username"
-                        value={profile.username}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label>Email:</label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={profile.email}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label>About:</label>
-                    <input
-                        type="text"
-                        name="about"
-                        value={profile.about}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label>Pronouns:</label>
-                    <input
-                        type="text"
-                        name="pronouns"
-                        value={profile.pronouns}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label>Location:</label>
-                    <input
-                        type="text"
-                        name="location"
-                        value={profile.location}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label>Label:</label>
-                    <input
-                        type="text"
-                        name="label"
-                        value={profile.label}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label>Name:</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={profile.name}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label>Profile Picture:</label>
-                    <input
-                        type="file"
-                        name="profilePicture"
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label>Banner:</label>
-                    <input
-                        type="file"
-                        name="banner"
-                        onChange={handleChange}
-                    />
-                </div>
-                <button type="submit">Save</button>
-            </form>
-        </div>
+        <form onSubmit={handleSubmit}>
+            <input
+                type="text"
+                name="username"
+                value={profile.username}
+                onChange={handleChange}
+                placeholder="Username"
+            />
+            <input
+                type="email"
+                name="email"
+                value={profile.email}
+                onChange={handleChange}
+                placeholder="Email"
+            />
+            <textarea
+                name="about"
+                value={profile.about}
+                onChange={handleChange}
+                placeholder="About"
+            />
+            <input
+                type="text"
+                name="pronouns"
+                value={profile.pronouns}
+                onChange={handleChange}
+                placeholder="Pronouns"
+            />
+            <input
+                type="text"
+                name="location"
+                value={profile.location}
+                onChange={handleChange}
+                placeholder="Location"
+            />
+            <input
+                type="text"
+                name="label"
+                value={profile.label}
+                onChange={handleChange}
+                placeholder="Label"
+            />
+            <input
+                type="text"
+                name="name"
+                value={profile.name}
+                onChange={handleChange}
+                placeholder="Name"
+            />
+            <input
+                type="file"
+                name="profilePicture"
+                onChange={handleChange}
+            />
+            <input
+                type="file"
+                name="banner"
+                onChange={handleChange}
+            />
+            <button type="submit">Update Profile</button>
+            {error && <p className="error">{error}</p>}
+        </form>
     );
 };
 

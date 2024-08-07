@@ -8,13 +8,21 @@ const NavBar = () => {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        await fetch('http://localhost:3000/auth/logout', {
-            method: 'POST',
-            credentials: 'include',
-        });
-        setUser(null);
-        navigate('/');
+        try {
+            await fetch('http://localhost:3000/auth/logout', {
+                method: 'POST',
+                credentials: 'include',
+            });
+            localStorage.removeItem('token'); // Remove token from localStorage
+            setUser(null); // Clear user state
+            navigate('/'); // Redirect to home page
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
     };
+    
+    // Ensure profilePicture URL is valid
+    const profilePictureUrl = user ? `http://localhost:3000/uploads/images/${user.profilePicture}` : '';
 
     return (
         <nav className="navbar">
@@ -23,10 +31,14 @@ const NavBar = () => {
                 <input type="text" placeholder="Search" />
                 <button>Search</button>
             </div>
-            < div className="user-section">
+            <div className="user-section">
                 {user ? (
                     <div className="dropdown">
-                        <img src={user.profilePicture} alt="Profile" className="profile-picture" />
+                        <img
+                            src={profilePictureUrl}
+                            alt={user.username ? `${user.username}'s profile picture` : 'Profile'}
+                            className="profile-picture"
+                        />
                         <div className="dropdown-content">
                             <button onClick={() => navigate('/profile')}>Profile</button>
                             <button onClick={() => navigate('/edit')}>Edit Profile</button>

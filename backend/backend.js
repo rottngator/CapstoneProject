@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { createUser, getUserByUsername, getUserById, verifyPassword, getFileById, deleteFileById, updateUserById, Track } = require('./dal/mongoDAL');
+const { createUser, getUserByUsername, getUserById, updateUserById, Track } = require('./dal/mongoDAL');
 const { GridFSBucket } = require('mongodb');
 const { uploadImage, uploadMusic } = require('./multerUpload'); // Import the updated multer configuration
 const app = express();
@@ -84,7 +84,7 @@ const authenticateToken = (req, res, next) => {
 // Profile Route
 app.get('/user/profile', authenticateToken, async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId);
+        const user = await getUserById(req.user.userId);
         if (!user) return res.status(404).json({ message: 'User not found' });
         res.json(user);
     } catch (err) {
@@ -95,15 +95,7 @@ app.get('/user/profile', authenticateToken, async (req, res) => {
 // Update route for the profile
 app.put('/user/profile', authenticateToken, uploadImage.fields([{ name: 'profilePicture' }, { name: 'banner' }]), async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId);
-        if (!user) return res.status(404).json({ message: 'User not found' });
-
-        const updates = {};
-        for (const key in req.body) {
-            if (req.body[key]) updates[key] = req.body[key];
-        }
-
-        // Handle file uploads separately
+        const updates = req.body;
         if (req.files) {
             if (req.files.profilePicture) {
                 updates.profilePicture = req.files.profilePicture[0].filename;
@@ -112,9 +104,8 @@ app.put('/user/profile', authenticateToken, uploadImage.fields([{ name: 'profile
                 updates.banner = req.files.banner[0].filename;
             }
         }
-
-        await User.findByIdAndUpdate(req.user.userId, updates, { new: true });
-        res.json({ message: 'Profile updated successfully' });
+        const updatedUser = await updateUserById(req.user.userId, updates);
+        res.json({ message: 'Profile updated successfully', user: updatedUser });
     } catch (err) {
         res.status(500).json({ message: 'Server error' });
     }
