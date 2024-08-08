@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from './UserContext';
+import './Register.css'; // Ensure this is imported for styling
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -44,38 +45,62 @@ const Register = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-                required
-            />
-            <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                required
-            />
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                required
-            />
-            <input
-                type="password"
-                value={passwordConfirmation}
-                onChange={(e) => setPasswordConfirmation(e.target.value)}
-                placeholder="Confirm Password"
-                required
-            />
-            <button type="submit">Register</button>
-            {error && <p className="error">{error}</p>}
-        </form>
+        <div className="register-page">
+            <div className="logo-container">
+                <img src="/images/The Sound Hub Logo.png" alt="Logo" className="logo" />
+            </div>
+            <div className="register-form-container">
+                <h1>Create an Account</h1>
+                <form onSubmit={handleSubmit} className="register-form">
+                    <div className="form-group">
+                        <label htmlFor="username">Username</label>
+                        <input
+                            id="username"
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Enter your username"
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Enter your email"
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <input
+                            id="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter your password"
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="passwordConfirmation">Confirm Password</label>
+                        <input
+                            id="passwordConfirmation"
+                            type="password"
+                            value={passwordConfirmation}
+                            onChange={(e) => setPasswordConfirmation(e.target.value)}
+                            placeholder="Confirm your password"
+                            required
+                        />
+                    </div>
+                    {error && <p className="error">{error}</p>}
+                    <button type="submit" className="register-button">Register</button>
+                </form>
+            </div>
+        </div>
     );
 };
 

@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from './UserContext';
+import './Login.css'; // Ensure this is imported for styling
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -38,22 +39,43 @@ const Login = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
-            />
-            <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-            />
-            <button type="submit">Login</button>
-            {error && <p className="error">{error}</p>}
-        </form>
+        <div className="login-page">
+            <div className="logo-container">
+                <img src="/images/The Sound Hub Logo.png" alt="Logo" className="logo" />
+            </div>
+            <div className="login-container">
+                <h1>Welcome Back!</h1>
+                <h2>Login to your account</h2>
+                <form onSubmit={handleSubmit} className="form">
+                    <div className="input-group">
+                        <label htmlFor="username">Username</label>
+                        <input
+                            id="username"
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="Enter your username"
+                        />
+                    </div>
+                    <div className="input-group">
+                        <label htmlFor="password">Password</label>
+                        <input
+                            id="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter your password"
+                        />
+                    </div>
+                    {error && <p className="error">{error}</p>}
+                    <button type="submit" className="login-button">Login</button>
+                </form>
+                <div className="register-link">
+                    <p>Don't have an account?</p>
+                    <button className="register-button" onClick={() => navigate('/register')}>Register</button>
+                </div>
+            </div>
+        </div>
     );
 };
 

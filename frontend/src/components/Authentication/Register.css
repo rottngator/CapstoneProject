@@ -13,61 +13,74 @@ body {
 }
 
 .register-form-container {
-    background-color: #15021e;
-    border-radius: 10px;
+    background-color: #1a0b2e;
+    border-radius: 8px;
     padding: 2rem;
-    width: 400px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
 }
 
 .logo-container {
     display: flex;
     justify-content: center;
-    align-items: center;
-    margin-left: 50px;
+    margin-bottom: 1.5rem;
 }
 
 .logo {
-    width: 300px;
+    width: 150px;
     height: auto;
 }
 
 h1 {
-    margin-bottom: 2rem;
-    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    font-weight: bold;
 }
 
 .register-form {
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 .form-group {
+    width: 100%;
     margin-bottom: 1rem;
 }
 
-label {
+.form-group label {
     display: block;
     margin-bottom: 0.5rem;
+    font-size: 1rem;
 }
 
-input {
+.form-group input {
     width: 100%;
-    padding: 0.5rem;
-    border: none;
-    border-radius: 5px;
-    background-color: #0b0113;
-    color: white;
-}
-
-.register-button {
     padding: 0.75rem;
     border: none;
     border-radius: 5px;
-    background-color: #6d47a7;
+    background-color: #2a1e46;
     color: white;
     font-size: 1rem;
+}
+
+.error {
+    color: #ff0000;
+    margin: 0.5rem 0;
+}
+
+.register-button {
+    background-color: #7242b1;
+    color: white;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
     cursor: pointer;
+    width: 100%;
 }
 
 .register-button:hover {
