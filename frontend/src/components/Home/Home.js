@@ -3,25 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import './Home.css';
 
 const Home = () => {
-    const [featuredTrack, setFeaturedTrack] = useState(null);
     const [recentTracks, setRecentTracks] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchTracks = async () => {
             try {
-                const response = await fetch('http://localhost:3000/tracks');
+                const response = await fetch('http://localhost:3000/uploads'); // Updated URL
                 const data = await response.json();
-                setFeaturedTrack(data.featured);
-                setRecentTracks(data.recent);
+                setRecentTracks(data);  // Directly set the recent tracks
             } catch (error) {
                 console.error('Error fetching tracks:', error);
             }
         };
-
         fetchTracks();
     }, []);
-
+    
     const handleCreateClick = () => {
         navigate('/upload');
     };
@@ -45,14 +42,12 @@ const Home = () => {
                                 <span>streaming: alkaline</span>
                             </div>
                         </div>
-
                         <div className='user'>
                             <div className='status'>
                                 @USERNAME
                                 <span>streaming: dial tone</span>
                             </div>
                         </div>
-
                         <div className='user'>
                             <div className='status'>
                                 @USERNAME
@@ -66,70 +61,41 @@ const Home = () => {
                     </div>
                 </div>
 
-                <div className='featured-tracks'>
-                    <h3>Featured Track</h3>
-                    {featuredTrack && (
-                        <div className='track'>
-                            <img src='/frontend/public/images/track.jpg' alt='featured track'/>
-                            <div className='track-info'>
-                                <h4>{featuredTrack.metadata.title}</h4>
-                                <p>{featuredTrack.metadata.artist}</p>
-                                <div className='track-details'>
-                                    <div className='track-stats'>
-                                        <div>Streams</div>
-                                        <div>00</div>
-                                    </div>
-                                    <div className='track-stats'>
-                                        <div>Likes</div>
-                                        <div>00</div>
-                                    </div>
-                                    <div className='track-stats'>
-                                        <div>Comments</div>
-                                        <div>00</div>
-                                    </div>
-                                </div>
-                            </div> 
-
-                            <div className='lyrics'>
-                                <h4>Lyrics</h4>
-                                <p>{featuredTrack.metadata.description}</p>
-                            </div>
-                            <audio controls src={`http://localhost:3000/files/${featuredTrack._id}`}></audio>
-                        </div>
-                    )}
-                </div>
-
                 <div className='recent-tracks'>
                     <h3>Recently Posted Tracks</h3>
-                    {recentTracks.map(upload => (
-                        <div key={upload._id} className='track'>
-                            <img src='/frontend/public/images/track.jpg' alt='recent track'/>
-                            <div className='track-info'>
-                                <h4>{upload.metadata.title}</h4>
-                                <p>{upload.metadata.artist}</p>
-                                <div className='track-details'>
-                                    <div className='track-stats'>
-                                        <div>Streams</div>
-                                        <div>00</div>
+                    {recentTracks.length > 0 ? (
+                        recentTracks.map(upload => (
+                            <div key={upload._id} className='track'>
+                                <img src='/images/track.jpg' alt='recent track'/>
+                                <div className='track-info'>
+                                    <h4>{upload.metadata.title}</h4>
+                                    <p>{upload.metadata.artist}</p>
+                                    <div className='track-details'>
+                                        <div className='track-stats'>
+                                            <div>Streams</div>
+                                            <div>00</div>
+                                        </div>
+                                        <div className='track-stats'>
+                                            <div>Likes</div>
+                                            <div>00</div>
+                                        </div>
+                                        <div className='track-stats'>
+                                            <div>Comments</div>
+                                            <div>00</div>
+                                        </div>
                                     </div>
-                                    <div className='track-stats'>
-                                        <div>Likes</div>
-                                        <div>00</div>
-                                    </div>
-                                    <div className='track-stats'>
-                                        <div>Comments</div>
-                                        <div>00</div>
-                                    </div>
-                                </div>
-                            </div> 
+                                </div> 
 
-                            <div className='lyrics'>
-                                <h4>Lyrics</h4>
-                                <p>{upload.metadata.description}</p>
+                                <div className='lyrics'>
+                                    <h4>Lyrics</h4>
+                                    <p>{upload.metadata.description}</p>
+                                </div>
+                                <audio controls src={`http://localhost:3000/files/${upload._id}`}></audio>
                             </div>
-                            <audio controls src={`http://localhost:3000/files/${upload._id}`}></audio>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <p>No recent tracks available</p>
+                    )}
                 </div>
 
                 <div className='sidebar-right'>

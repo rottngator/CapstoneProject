@@ -34,9 +34,11 @@
     object-fit: cover;
 }
 
+
 .about-section {
     margin-top: 100px;
-    padding: 20px;
+    /* margin-left: 150px; */
+    padding: 60px;
     background: #050b29;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);

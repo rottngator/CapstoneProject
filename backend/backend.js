@@ -177,14 +177,19 @@ app.get('/files/:id', (req, res) => {
 });
 
 // Route to fetch uploaded files metadata
+// Route to fetch recently uploaded files
 app.get('/uploads', async (req, res) => {
     try {
-        const files = await bucket.find().toArray();
-        res.status(200).json(files);
+        // Fetch recently uploaded files
+        const recentFiles = await bucket.find().sort({ uploadDate: -1 }).toArray();
+        res.status(200).json(recentFiles);
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+
+
 
 app.post('/upload', upload.single('file'), (req, res) => {
     console.log('Uploaded file:', req.file); // Log the uploaded file info
