@@ -1,40 +1,21 @@
 const multer = require('multer');
 const path = require('path');
 
-const storage = multer.memoryStorage();
-
-const uploadImage = multer({
-    storage,
-    limits: {
-        fileSize: 10 * 1024 * 1024 // Limit image file size to 10 MB
+// Define storage location and file naming
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, '../public/uploads')); // Ensure the path is correct
     },
-    fileFilter: (req, file, cb) => {
-        const filetypes = /jpeg|jpg|png/;
-        const mimetype = filetypes.test(file.mimetype);
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        if (mimetype && extname) {
-            return cb(null, true);
-        } else {
-            cb(new Error('Only images are allowed!'));
-        }
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname));
     }
 });
 
-const uploadMusic = multer({
+const upload = multer({
     storage,
     limits: {
-        fileSize: 100 * 1024 * 1024 // Limit music file size to 100 MB
-    },
-    fileFilter: (req, file, cb) => {
-        const filetypes = /mp3|wav|flac/;
-        const mimetype = filetypes.test(file.mimetype);
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        if (mimetype && extname) {
-            return cb(null, true);
-        } else {
-            cb(new Error('Only music files are allowed!'));
-        }
+        fileSize: 10 * 1024 * 1024 // Default limit to 10 MB
     }
 });
 
-module.exports = { uploadImage, uploadMusic };
+module.exports = upload;

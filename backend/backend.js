@@ -5,11 +5,26 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const path = require('path');
+const fs = require('fs');
 const { createUser, getUserByUsername, getUserById, updateUserById, Track } = require('./dal/mongoDAL');
-const { uploadImage, uploadMusic } = require('./multerUpload'); // Import the updated multer configuration
+const upload = require('./multerUpload');
 const app = express();
 const port = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'nepenthe';
+
+// Create directory if it doesn't exist
+const createDirectory = (dir) => {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+};
+
+const uploadDir = path.join(__dirname, '../public/uploads');
+createDirectory(uploadDir);
+
+// Serve static files for images and music
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 // CORS configuration
 app.use(cors({
@@ -91,15 +106,15 @@ app.get('/user/profile', authenticateToken, async (req, res) => {
 });
 
 // Update route for the profile
-app.put('/user/profile', authenticateToken, uploadImage.fields([{ name: 'profilePicture' }, { name: 'banner' }]), async (req, res) => {
+app.put('/user/profile', authenticateToken, upload.fields([{ name: 'profilePicture' }, { name: 'banner' }]), async (req, res) => {
     try {
         const updates = req.body;
         if (req.files) {
             if (req.files.profilePicture) {
-                updates.profilePicture = req.files.profilePicture[0].filename;
+                updates.profilePicture = `/uploads/${req.files.profilePicture[0].filename}`;
             }
             if (req.files.banner) {
-                updates.banner = req.files.banner[0].filename;
+                updates.banner = `/uploads/${req.files.banner[0].filename}`;
             }
         }
         const updatedUser = await updateUserById(req.user.userId, updates);
@@ -109,6 +124,7 @@ app.put('/user/profile', authenticateToken, uploadImage.fields([{ name: 'profile
     }
 });
 
+
 // Logout Route
 app.post('/auth/logout', (req, res) => {
     res.cookie('token', '', { maxAge: 1 });
@@ -116,11 +132,12 @@ app.post('/auth/logout', (req, res) => {
 });
 
 // Music File Upload Route
-app.post('/upload', authenticateToken, uploadMusic.single('file'), (req, res) => {
+app.post('/upload/music', authenticateToken, upload.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
     }
 
+    // Assuming `bucket` is defined somewhere else
     const uploadStream = bucket.openUploadStream(req.file.originalname, {
         metadata: {
             title: req.body.title,
@@ -141,7 +158,7 @@ app.post('/upload', authenticateToken, uploadMusic.single('file'), (req, res) =>
     uploadStream.end(req.file.buffer);
 });
 
-// Route to serve files
+// Route to serve music files
 app.get('/files/:id', (req, res) => {
     const fileId = new mongoose.Types.ObjectId(req.params.id);
     const downloadStream = bucket.openDownloadStream(fileId);
@@ -168,6 +185,16 @@ app.get('/uploads', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+app.post('/upload', upload.single('file'), (req, res) => {
+    console.log('Uploaded file:', req.file); // Log the uploaded file info
+    if (req.file) {
+        res.json({ file: req.file });
+    } else {
+        res.status(400).send('No file uploaded.');
+    }
+});
+
 
 // Route to delete files
 app.delete('/files/:id', authenticateToken, async (req, res) => {

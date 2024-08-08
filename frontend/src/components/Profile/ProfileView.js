@@ -25,12 +25,12 @@ const ProfileView = () => {
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-        
+
                 if (!response.ok) {
                     console.error('Failed to fetch profile data:', response.statusText);
                     return;
                 }
-        
+
                 const data = await response.json();
                 setProfileData(data); // Directly set the data object
                 console.log(data);  // Log the fetched data
@@ -38,21 +38,27 @@ const ProfileView = () => {
                 console.error('Failed to fetch profile data:', error.message);
             }
         };
-    
+
         fetchProfileData();
     }, []);
-    
+
     return (
         <div className="container profile-container">
             <div className="profile-header">
-                <div
-                    className="background-image"
-                    style={{ backgroundImage: `url(${profileData.banner})` }}
-                ></div>
+            <div className="background-image" 
+                style={{ backgroundImage: 
+                    `url(${profileData.banner ? `/uploads/${profileData.banner}` : ''})` }} 
+                > {console.log('Banner URL:', profileData.banner)} </div>
                 <div className="profile-picture">
-                    <img src={profileData.profilePicture} alt="Profile" className="rounded-circle" />
+                    <img 
+                    src={`/uploads/${profileData.profilePicture || 'default.png'}`} 
+                    alt="Profile" 
+                    className="rounded-circle" 
+                    />
+                    {console.log('Profile Picture URL:', `/uploads/${profileData.profilePicture}`)}
                 </div>
             </div>
+            
             <div className="about-section mt-3">
                 <h2>ABOUT</h2>
                 <p>{profileData.about}</p>
