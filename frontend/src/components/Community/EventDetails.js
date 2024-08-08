@@ -1,45 +1,41 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
-const EventDetails = ({ events }) => {
-    const { id } = useParams();
-    const [event, setEvent] = useState(events.find(event => event.id === parseInt(id)));
-    const [isRSVPd, setIsRSVPd] = useState(false);
+const EventDetails = () => {
+    const { id } = useParams(); // Extracts id from URL parameters
+    const [event, setEvent] = useState(null);
 
-    const handleRSVP = async () => {
-        try {
-            const response = await fetch(`http://localhost:3000/events/${id}/rsvp`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ userId: 'currentUserId' }), // replace with actual user ID
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to RSVP');
+    useEffect(() => {
+        const fetchEvent = async () => {
+            if (!id) {
+                console.error('Event ID is missing');
+                return;
             }
 
-            setIsRSVPd(true);
-        } catch (error) {
-            console.error('Error RSVPing:', error);
-        }
-    };
+            try {
+                const response = await axios.get(`http://localhost:3000/events/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                setEvent(response.data);
+            } catch (error) {
+                console.error('Error fetching event:', error);
+            }
+        };
 
-    if (!event) {
-        return <div>Event not found</div>;
-    }
+        fetchEvent();
+    }, [id]);
+
+    if (!event) return <div>Loading...</div>;
 
     return (
-        <div className="event-details">
+        <div>
             <h1>{event.title}</h1>
-            <p>Date: {event.date.toLocaleDateString()}</p>
-            <p>Description: {event.description}</p>
-            <p>Location: {event.location}</p>
-            <p>Time: {event.time}</p>
-            <button onClick={handleRSVP} disabled={isRSVPd}>
-                {isRSVPd ? 'RSVP’d' : 'RSVP'}
-            </button>
+            <p>{event.description}</p>
+            <p>{event.location}</p>
+            <p>{event.time}</p>
         </div>
     );
 };

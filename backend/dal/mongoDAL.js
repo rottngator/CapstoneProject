@@ -8,12 +8,14 @@ mongoose.connect(mongoURI, {
 })
     .then(() => {
         console.log('MongoDB connection established successfully.');
+        // Initialize GridFSBucket
         bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
             bucketName: 'tracks'
         });
     })
     .catch((err) => console.error('Failed to connect to MongoDB:', err));
 
+// Define schemas and models
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -40,6 +42,24 @@ const trackSchema = new mongoose.Schema({
 
 const Track = mongoose.model('Track', trackSchema);
 
+const eventSchema = new mongoose.Schema({
+    title: { type: String, required: true },
+    date: { type: Date, required: true },
+    description: { type: String },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true });
+
+const Event = mongoose.model('Event', eventSchema);
+
+// Define and initialize bucket
+let bucket;
+mongoose.connection.once('open', () => {
+    bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+        bucketName: 'tracks'
+    });
+});
+
+// Export functions and models
 const createUser = async (userData) => {
     const user = new User(userData);
     await user.save();
@@ -68,4 +88,14 @@ const deleteFileById = async (fileId) => {
     await bucket.delete(new mongoose.Types.ObjectId(fileId));
 };
 
-module.exports = { createUser, getUserByUsername, getUserById, updateUserById, deleteFileById, Track };
+// Export models
+module.exports = 
+{ 
+    createUser, 
+    getUserByUsername, 
+    getUserById, 
+    updateUserById, 
+    deleteFileById, 
+    Track, 
+    bucket, 
+    Event };

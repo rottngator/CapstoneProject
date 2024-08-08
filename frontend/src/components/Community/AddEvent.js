@@ -1,72 +1,48 @@
+// AddEvent.js
+
 import React, { useState } from 'react';
+import axios from 'axios';
 
-const AddEvent = ({ onAdd }) => {
-    const [newEvent, setNewEvent] = useState({
-        title: '',
-        description: '',
-        location: '',
-        time: '',
-        date: '',
-    });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setNewEvent((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
+const AddEvent = () => {
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [location, setLocation] = useState('');
+    const [time, setTime] = useState('');
+    const [date, setDate] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const token = localStorage.getItem('token'); // or however you're storing the token
+
         try {
-            // Send POST request to add the event
-            const response = await fetch('http://localhost:3000/events', {
-                method: 'POST',
+            const response = await axios.post('http://localhost:3000/events', {
+                title,
+                description,
+                location,
+                time,
+                date
+            }, {
                 headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newEvent),
+                    'Authorization': `Bearer ${token}`
+                }
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to add event');
-            }
-
-            const addedEvent = await response.json();
-            onAdd(addedEvent);
+            console.log('Event added:', response.data);
         } catch (error) {
             console.error('Error adding event:', error);
         }
     };
 
     return (
-        <div>
-            <h2>Add Event</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Title:</label>
-                    <input type="text" name="title" value={newEvent.title} onChange={handleChange} required />
-                </div>
-                <div>
-                    <label>Description:</label>
-                    <input type="text" name="description" value={newEvent.description} onChange={handleChange} />
-                </div>
-                <div>
-                    <label>Location:</label>
-                    <input type="text" name="location" value={newEvent.location} onChange={handleChange} />
-                </div>
-                <div>
-                    <label>Time:</label>
-                    <input type="time" name="time" value={newEvent.time} onChange={handleChange} />
-                </div>
-                <div>
-                    <label>Date:</label>
-                    <input type="date" name="date" value={newEvent.date} onChange={handleChange} />
-                </div>
-                <button type="submit">Add Event</button>
-            </form>
-        </div>
+        <form onSubmit={handleSubmit}>
+            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Title" />
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description"></textarea>
+            <input type="text" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location" />
+            <input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            <button type="submit">Add Event</button>
+        </form>
     );
 };
 

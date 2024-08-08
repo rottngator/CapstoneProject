@@ -16,31 +16,29 @@ import Feedback from './components/Community/Feedback';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { UserProvider } from './components/Authentication/UserContext';
 import EditProfile from './components/Profile/EditProfile';
-
-const events = [
-    { id: 1, date: new Date(2024, 6, 10), title: 'Event 1', description: 'Description 1', location: 'Location 1', time: '10:00 AM' },
-    { id: 2, date: new Date(2024, 6, 15), title: 'Event 2', description: 'Description 2', location: 'Location 2', time: '2:00 PM' },
-];
+import { EventProvider } from './components/Community/EventContext'; // Import EventProvider
 
 const App = () => {
     return (
         <UserProvider>
-            <>
-                <NavBar />
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/profile" element={<ProtectedRoute element={ProfileView} />} />
-                    <Route path='/edit' element={<ProtectedRoute element={EditProfile} />} />
-                    <Route path="/upload" element={<ProtectedRoute element={MusicUpload} />} />
-                    <Route path="/chat" element={<ProtectedRoute element={CommunityChat} />} />
-                    <Route path="/calendar" element={<ProtectedRoute element={EventCalendar} />} />
-                    <Route path="/event/:id" element={<ProtectedRoute element={() => <EventDetails events={events} />} />} />
-                    <Route path="/feedback" element={<ProtectedRoute element={Feedback} />} />
-                </Routes>
-            </>
+            <EventProvider> {/* Wrap with EventProvider */}
+                <>
+                    <NavBar />
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/profile" element={<ProtectedRoute element={ProfileView} />} />
+                        <Route path='/edit' element={<ProtectedRoute element={EditProfile} />} />
+                        <Route path="/upload" element={<ProtectedRoute element={MusicUpload} />} />
+                        <Route path="/chat" element={<ProtectedRoute element={CommunityChat} />} />
+                        <Route path="/calendar" element={<ProtectedRoute element={EventCalendar} />} />
+                        <Route path="/event/:id" element={<ProtectedRoute element={EventDetails} />} />
+                        <Route path="/feedback" element={<ProtectedRoute element={Feedback} />} />
+                    </Routes>
+                </>
+            </EventProvider>
         </UserProvider>
     );
 };

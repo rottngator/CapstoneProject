@@ -1,24 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
 
 const Home = () => {
-    const [recentTracks, setRecentTracks] = useState([]);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchTracks = async () => {
-            try {
-                const response = await fetch('http://localhost:3000/uploads'); // Updated URL
-                const data = await response.json();
-                setRecentTracks(data);  // Directly set the recent tracks
-            } catch (error) {
-                console.error('Error fetching tracks:', error);
-            }
-        };
-        fetchTracks();
-    }, []);
-    
+    // Static data for recent tracks
+    const recentTracks = [
+        { id: '1', title: 'Track 1', artist: 'Artist 1', description: 'Description for Track 1' },
+        { id: '2', title: 'Track 2', artist: 'Artist 2', description: 'Description for Track 2' },
+        { id: '3', title: 'Track 3', artist: 'Artist 3', description: 'Description for Track 3' },
+    ];
+
     const handleCreateClick = () => {
         navigate('/upload');
     };
@@ -64,12 +57,12 @@ const Home = () => {
                 <div className='recent-tracks'>
                     <h3>Recently Posted Tracks</h3>
                     {recentTracks.length > 0 ? (
-                        recentTracks.map(upload => (
-                            <div key={upload._id} className='track'>
+                        recentTracks.map(track => (
+                            <div key={track.id} className='track'>
                                 <img src='/images/track.jpg' alt='recent track'/>
                                 <div className='track-info'>
-                                    <h4>{upload.metadata.title}</h4>
-                                    <p>{upload.metadata.artist}</p>
+                                    <h4>{track.title}</h4>
+                                    <p>{track.artist}</p>
                                     <div className='track-details'>
                                         <div className='track-stats'>
                                             <div>Streams</div>
@@ -84,13 +77,13 @@ const Home = () => {
                                             <div>00</div>
                                         </div>
                                     </div>
-                                </div> 
+                                </div>
 
                                 <div className='lyrics'>
                                     <h4>Lyrics</h4>
-                                    <p>{upload.metadata.description}</p>
+                                    <p>{track.description}</p>
                                 </div>
-                                <audio controls src={`http://localhost:3000/files/${upload._id}`}></audio>
+                                <audio controls src={`/files/${track.id}`}></audio>
                             </div>
                         ))
                     ) : (

@@ -7,11 +7,21 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
-const { createUser, getUserByUsername, getUserById, updateUserById, Track } = require('./dal/mongoDAL');
+const { createUser, getUserByUsername, getUserById, updateUserById, Track, bucket, Event } = require('./dal/mongoDAL');
 const upload = require('./multerUpload');
 const app = express();
-const port = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'nepenthe';
+
+const port = 3000;
+
+// CORS configuration
+app.use(cors({
+    origin: 'http://localhost:3001',  // Your frontend origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Allowed methods
+    credentials: true
+}));
+
+app.use(express.static('public'));
 
 // Create directory if it doesn't exist
 const createDirectory = (dir) => {
@@ -25,12 +35,6 @@ createDirectory(uploadDir);
 
 // Serve static files for images and music
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
-
-// CORS configuration
-app.use(cors({
-    origin: 'http://localhost:3001',
-    credentials: true,
-}));
 
 // Middleware
 app.use(express.json());
@@ -124,7 +128,6 @@ app.put('/user/profile', authenticateToken, upload.fields([{ name: 'profilePictu
     }
 });
 
-
 // Logout Route
 app.post('/auth/logout', (req, res) => {
     res.cookie('token', '', { maxAge: 1 });
@@ -176,23 +179,39 @@ app.get('/files/:id', (req, res) => {
     });
 });
 
-// Route to fetch uploaded files metadata
-// Route to fetch recently uploaded files
+
+// Route to fetch recently uploaded files including music
 app.get('/uploads', async (req, res) => {
     try {
-        // Fetch recently uploaded files
-        const recentFiles = await bucket.find().sort({ uploadDate: -1 }).toArray();
-        res.status(200).json(recentFiles);
+        // Fetch recent images from 'uploads' directory
+        const imageFiles = fs.readdirSync(uploadDir).map(file => ({
+            filename: file,
+            path: `/uploads/${file}`,
+            type: 'image'
+        }));
+
+        // Fetch recent music files from GridFS
+        const recentTracks = await bucket.find().sort({ uploadDate: -1 }).toArray();
+        const musicFiles = recentTracks.map(track => ({
+            _id: track._id,
+            title: track.metadata.title,
+            artist: track.metadata.artist,
+            description: track.metadata.description,
+            path: `/files/${track._id}`,
+            type: 'audio'
+        }));
+
+        // Combine and send both image and music files
+        const files = [...imageFiles, ...musicFiles];
+        res.status(200).json(files);
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
 
 
-
-
 app.post('/upload', upload.single('file'), (req, res) => {
-    console.log('Uploaded file:', req.file); // Log the uploaded file info
+    console.log('Uploaded file:', req.file);
     if (req.file) {
         res.json({ file: req.file });
     } else {
@@ -236,10 +255,90 @@ app.get('/tracks/featured', async (req, res) => {
             res.status(404).json({ message: 'No featured track found' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Internal server error', error: error.message });
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+// Event Routes
+// Create a new event
+app.post('/events', authenticateToken, async (req, res) => {
+    try {
+        const { title, description, location, time, date } = req.body;
+
+        // Validate input
+        if (!title || !description || !location || !time || !date) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
+        // Create and save the event
+        const event = new Event({
+            title,
+            description,
+            location,
+            time,
+            date,
+            user: req.user.userId // Associate event with the user if needed
+        });
+
+        await event.save();
+        res.status(201).json(event);
+    } catch (error) {
+        console.error('Error creating event:', error); // Log the error for debugging
+        res.status(500).json({ message: 'Internal server error', details: error.message });
+    }
 });
+
+
+// Get all events
+app.get('/events', async (req, res) => {
+    try {
+        const events = await Event.find().sort({ date: -1 }); // Sorting by date, latest first
+        res.status(200).json(events);
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error', details: error.message });
+    }
+});
+
+// Get an event by ID
+app.get('/events/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Convert id to ObjectId
+        const objectId = mongoose.Types.ObjectId(id);
+
+        const event = await Event.findById(objectId);
+        if (!event) return res.status(404).send('Event not found');
+        res.json(event);
+    } catch (error) {
+        console.error(error); // Log the error
+        res.status(500).json({ message: 'Internal server error', details: error.message });
+    }
+});
+
+
+// Update an event by ID
+app.put('/events/:id', authenticateToken, async (req, res) => {
+    try {
+        const updates = req.body;
+        const updatedEvent = await Event.findByIdAndUpdate(req.params.id, updates, { new: true });
+        if (!updatedEvent) return res.status(404).json({ message: 'Event not found' });
+        res.status(200).json(updatedEvent);
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error', details: error.message });
+    }
+});
+
+// Delete an event by ID
+app.delete('/events/:id', authenticateToken, async (req, res) => {
+    try {
+        const deletedEvent = await Event.findByIdAndDelete(req.params.id);
+        if (!deletedEvent) return res.status(404).json({ message: 'Event not found' });
+        res.status(200).json({ message: 'Event deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error', details: error.message });
+    }
+});
+
+// Start server
+app.listen(port, () => console.log(`Server running on port ${port}`));

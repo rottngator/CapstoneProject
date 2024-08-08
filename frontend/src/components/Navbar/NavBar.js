@@ -39,6 +39,9 @@ const NavBar = () => {
                         <div className="dropdown-content">
                             <button onClick={() => navigate('/profile')}>Profile</button>
                             <button onClick={() => navigate('/edit')}>Edit Profile</button>
+                            <button onClick={() => navigate('/calendar')}>Calendar</button>
+                            <button onClick={() => navigate('/feedback')}>Feedback</button>
+                            <button onClick={() => navigate('/chat')}>Chat</button>
                             <button onClick={handleLogout}>Logout</button>
                         </div>
                     </div>
