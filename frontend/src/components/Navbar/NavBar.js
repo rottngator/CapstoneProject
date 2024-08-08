@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../Authentication/UserContext';
 import './NavBar.css';
@@ -6,6 +6,9 @@ import './NavBar.css';
 const NavBar = () => {
     const { user, setUser } = useContext(UserContext);
     const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const handleLogout = async () => {
         try {
@@ -13,12 +16,48 @@ const NavBar = () => {
                 method: 'POST',
                 credentials: 'include',
             });
-            localStorage.removeItem('token'); // Remove token from localStorage
-            setUser(null); // Clear user state
-            navigate('/'); // Redirect to home page
+            localStorage.removeItem('token');
+            setUser(null);
+            navigate('/');
         } catch (error) {
             console.error('Logout error:', error);
         }
+    };
+
+    const fetchSuggestions = async (query) => {
+        try {
+            setLoading(true);
+            const response = await fetch(`http://localhost:3000/user/search?query=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            setSuggestions(data);
+            setLoading(false);
+        } catch (error) {
+            console.error('Suggestions error:', error);
+            setLoading(false);
+        }
+    };
+    
+
+    const handleSearchInputChange = (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+
+        if (query.trim()) {
+            fetchSuggestions(query);
+        } else {
+            setSuggestions([]);
+        }
+    };
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (searchQuery.trim() === '') return;
+        navigate(`/search?query=${encodeURIComponent(searchQuery)}`);
+    };
+
+    const clearSearch = () => {
+        setSearchQuery('');
+        setSuggestions([]);
     };
 
     return (
@@ -26,10 +65,26 @@ const NavBar = () => {
             <a href="/" className="logo">
                 <img src="/images/The Sound Hub Logo.png" alt="The Sound Hub Logo" />
             </a>
-            <div className="search-bar">
-                <input type="text" placeholder="Search" />
-                <button>Search</button>
-            </div>
+            <form className="search-bar" onSubmit={handleSearch}>
+                <input
+                    type="text"
+                    placeholder="Search"
+                    value={searchQuery}
+                    onChange={handleSearchInputChange}
+                />
+                <button type="submit">Search</button>
+                {searchQuery && <button type="button" onClick={clearSearch}>Clear</button>}
+                {loading && <div className="loading-spinner">Loading...</div>}
+                {suggestions.length > 0 && (
+                    <ul className="suggestions">
+                        {suggestions.map((suggestion, index) => (
+                            <li key={index} onClick={() => setSearchQuery(suggestion)}>
+                                {suggestion}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </form>
             <div className="user-section">
                 {user ? (
                     <div className="dropdown">

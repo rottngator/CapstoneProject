@@ -128,6 +128,44 @@ app.put('/user/profile', authenticateToken, upload.fields([{ name: 'profilePictu
     }
 });
 
+// Route to get tracks uploaded by a specific user
+app.get('/user/tracks', authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const userTracks = await Track.find({ "metadata.user": userId }).sort({ uploadDate: -1 });
+
+        if (!userTracks) return res.status(404).json({ message: 'No tracks found' });
+
+        const tracks = userTracks.map(track => ({
+            _id: track._id,
+            title: track.metadata.title,
+            artist: track.metadata.artist,
+            description: track.metadata.description,
+            path: `/files/${track._id}`,
+        }));
+
+        res.status(200).json(tracks);
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// Search Suggestions Route
+app.get('/user/search', async (req, res) => {
+    const { query } = req.query;
+    try {
+        const users = await getUserByUsername(new RegExp(query, 'i'));
+        if (!users || users.length === 0) {
+            return res.status(404).json({ message: 'No users found' });
+        }
+        res.status(200).json(users);
+    } catch (error) {
+        console.error('Error searching users:', error);
+        res.status(500).json({ message: 'Internal server error', details: error.message });
+    }
+});
+
+
 // Logout Route
 app.post('/auth/logout', (req, res) => {
     res.cookie('token', '', { maxAge: 1 });
@@ -287,7 +325,6 @@ app.post('/events', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error', details: error.message });
     }
 });
-
 
 // Get all events
 app.get('/events', async (req, res) => {

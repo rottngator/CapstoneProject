@@ -67,7 +67,12 @@ const createUser = async (userData) => {
 };
 
 const getUserByUsername = async (username) => {
-    return User.findOne({ username });
+    try {
+        const users = await User.find({ username: { $regex: username, $options: 'i' } });
+        return users;
+    } catch (error) {
+        throw new Error('Error finding users');
+    }
 };
 
 const getUserById = async (id) => {

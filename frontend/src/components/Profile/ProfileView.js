@@ -15,35 +15,55 @@ const ProfileView = () => {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [tracks, setTracks] = useState([]);
+
 
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`http://localhost:3000/user/profile`, {
+                
+                // Fetch profile data
+                const profileResponse = await fetch(`http://localhost:3000/user/profile`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`,
                     },
                 });
-
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch profile data: ${response.statusText}`);
+    
+                if (!profileResponse.ok) {
+                    throw new Error(`Failed to fetch profile data: ${profileResponse.statusText}`);
                 }
-
-                const data = await response.json();
-                setProfileData(data); // Directly set the data object
-                console.log('Profile data:', data);  // Log the fetched data
+    
+                const profileData = await profileResponse.json();
+                setProfileData(profileData);
+    
+                // Fetch user's uploaded tracks
+                const tracksResponse = await fetch(`http://localhost:3000/user/tracks`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+    
+                if (!tracksResponse.ok) {
+                    throw new Error(`Failed to fetch tracks: ${tracksResponse.statusText}`);
+                }
+    
+                const tracksData = await tracksResponse.json();
+                setTracks(tracksData);
+    
             } catch (error) {
-                console.error('Failed to fetch profile data:', error.message);
+                console.error('Failed to fetch data:', error.message);
                 setError(error.message);
             } finally {
                 setLoading(false);
             }
         };
         fetchProfileData();
-    }, []);
+    }, []);    
 
     if (loading) {
         return <div>Loading...</div>;
@@ -52,6 +72,8 @@ const ProfileView = () => {
     if (error) {
         return <div>Error: {error}</div>;
     }
+
+    
 
     // Ensure URLs are correct and valid
     const profilePictureUrl = `http://localhost:3000${profileData.profilePicture}`;
@@ -100,10 +122,20 @@ const ProfileView = () => {
                     </div>
                     <div className="tracks-section">
                         <h2>TRACKS</h2>
-                        <div className="track">
-                            <img src="/images/track.jpg" alt="Track" />
-                            <p>Dungeon Meshi</p>
-                        </div>
+                        {tracks.length === 0 ? (
+                            <p>No tracks uploaded yet.</p>
+                        ) : (
+                            tracks.map(track => (
+                                <div key={track._id} className="track">
+                                    <audio controls>
+                                        <source src={`http://localhost:3000${track.path}`} type="audio/mpeg" />
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                    <p>{track.title} by {track.artist}</p>
+                                    <p>{track.description}</p>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>

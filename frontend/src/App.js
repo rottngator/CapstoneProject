@@ -16,7 +16,8 @@ import Feedback from './components/Community/Feedback';
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import { UserProvider } from './components/Authentication/UserContext';
 import EditProfile from './components/Profile/EditProfile';
-import { EventProvider } from './components/Community/EventContext'; // Import EventProvider
+import { EventProvider } from './components/Community/EventContext';
+import SearchResults from './components/Search/SearchResults';
 
 const App = () => {
     return (
@@ -36,6 +37,7 @@ const App = () => {
                         <Route path="/calendar" element={<ProtectedRoute element={EventCalendar} />} />
                         <Route path="/event/:id" element={<ProtectedRoute element={EventDetails} />} />
                         <Route path="/feedback" element={<ProtectedRoute element={Feedback} />} />
+                        <Route path='/search' ekey="search" element={<ProtectedRoute element={SearchResults} />} />
                     </Routes>
                 </>
             </EventProvider>
