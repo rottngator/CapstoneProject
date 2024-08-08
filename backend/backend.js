@@ -23,8 +23,13 @@ const createDirectory = (dir) => {
 const uploadDir = path.join(__dirname, '../public/uploads');
 createDirectory(uploadDir);
 
+const imageDir = path.join(__dirname, '../public/images');
+createDirectory(imageDir);
+
 // Serve static files for images and music
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
+
 
 // CORS configuration
 app.use(cors({

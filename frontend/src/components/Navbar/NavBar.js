@@ -22,7 +22,7 @@ const NavBar = () => {
     };
     
     // Ensure profilePicture URL is valid
-    const profilePictureUrl = user ? `http://localhost:3000/uploads/images/${user.profilePicture}` : '';
+    const profilePictureUrl = user ? `http://localhost:3000/public/uploads/${user.profilePicture}` : '';
 
     return (
         <nav className="navbar">

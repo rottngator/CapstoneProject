@@ -47,15 +47,15 @@ const ProfileView = () => {
             <div className="profile-header">
             <div className="background-image" 
                 style={{ backgroundImage: 
-                    `url(${profileData.banner ? `/uploads/${profileData.banner}` : ''})` }} 
+                        `url(${profileData.banner ? `/images/${profileData.banner}` : ''})` }} 
                 > {console.log('Banner URL:', profileData.banner)} </div>
                 <div className="profile-picture">
                     <img 
-                    src={`/uploads/${profileData.profilePicture || 'default.png'}`} 
-                    alt="Profile" 
-                    className="rounded-circle" 
+                        src={`/images/${profileData.profilePicture || 'default.png'}`} 
+                        alt="Profile" 
+                        className="rounded-circle" 
                     />
-                    {console.log('Profile Picture URL:', `/uploads/${profileData.profilePicture}`)}
+                    {console.log('Profile Picture URL:', `${profileData.profilePicture || 'default.png'}`)}
                 </div>
             </div>
             

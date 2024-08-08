@@ -55,13 +55,13 @@ const EditProfile = () => {
         try {
             const token = localStorage.getItem('token');
             const formData = new FormData();
-    
+        
             for (const key in profile) {
                 if (profile[key]) {
                     formData.append(key, profile[key]);
                 }
             }
-    
+        
             const response = await fetch('http://localhost:3000/user/profile', {
                 method: 'PUT',
                 headers: {
@@ -69,12 +69,12 @@ const EditProfile = () => {
                 },
                 body: formData,
             });
-    
+        
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Profile update failed');
             }
-    
+        
             const data = await response.json();
             setProfile(data);
             navigate('/profile');
@@ -82,8 +82,7 @@ const EditProfile = () => {
             console.error('Profile update error:', error);
             setError('Profile update failed. Please try again.');
         }
-    };
-    
+    };    
 
     return (
         <form onSubmit={handleSubmit}>
