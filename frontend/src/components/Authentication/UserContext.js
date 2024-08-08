@@ -7,17 +7,23 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         const fetchUser = async () => {
-            try {
-                const response = await fetch('http://localhost:3000/user/profile', {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setUser(data);
+            const token = localStorage.getItem('token'); // Get token from localStorage
+            if (token) {
+                try {
+                    const response = await fetch('http://localhost:3000/user/profile', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        credentials: 'include',
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        setUser(data);
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch user:', error);
                 }
-            } catch (error) {
-                console.error('Failed to fetch user:', error);
             }
         };
 

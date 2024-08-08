@@ -14,10 +14,13 @@
     color: white;
 }
 
+.logo img {
+    width: 100px;
+}
+
 .search-bar {
     position: absolute;
     left: 50%;
-    margin-top: 20px;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
@@ -36,7 +39,6 @@
 .search-bar input:hover {
     border-color: #ffffff; /* White border on hover */
 }
-
 
 .search-bar button {
     padding: 5px 10px;
@@ -57,18 +59,22 @@
     align-items: center;
 }
 
-.profile-picture {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
+.welcome-button {
+    background: none;
+    color: white;
+    border: none;
     cursor: pointer;
-    margin-right: 10px;
-    margin-top: -240px;
-    margin-left: -150px;
+    font-size: 1rem;
+    padding: 5px 10px;
+}
+
+.welcome-button:hover {
+    text-decoration: underline;
 }
 
 .dropdown {
     position: relative;
+    margin-left: 10px;
 }
 
 .dropdown-content {
@@ -79,8 +85,7 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 1;
     right: 0;
-    top: 50%;
-    margin-top: 20px;
+    top: 100%;
     border-radius: 8px;
 }
 
@@ -91,6 +96,7 @@
     background: none;
     cursor: pointer;
     text-align: left;
+    color: white;
 }
 
 .dropdown-content button:hover {

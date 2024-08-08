@@ -20,13 +20,12 @@ const NavBar = () => {
             console.error('Logout error:', error);
         }
     };
-    
-    // Ensure profilePicture URL is valid
-    const profilePictureUrl = user ? `http://localhost:3000/public/uploads/${user.profilePicture}` : '';
 
     return (
         <nav className="navbar">
-            <div className="logo">The Sound Hub</div>
+            <a href="/" className="logo">
+                <img src="/images/The Sound Hub Logo.png" alt="The Sound Hub Logo" />
+            </a>
             <div className="search-bar">
                 <input type="text" placeholder="Search" />
                 <button>Search</button>
@@ -34,11 +33,9 @@ const NavBar = () => {
             <div className="user-section">
                 {user ? (
                     <div className="dropdown">
-                        <img
-                            src={profilePictureUrl}
-                            alt={user.username ? `${user.username}'s profile picture` : 'Profile'}
-                            className="profile-picture"
-                        />
+                        <button className="welcome-button">
+                            Welcome, {user.username}!
+                        </button>
                         <div className="dropdown-content">
                             <button onClick={() => navigate('/profile')}>Profile</button>
                             <button onClick={() => navigate('/edit')}>Edit Profile</button>

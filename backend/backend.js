@@ -20,16 +20,11 @@ const createDirectory = (dir) => {
     }
 };
 
-const uploadDir = path.join(__dirname, '../public/uploads');
+const uploadDir = path.join(__dirname, '/public/uploads');
 createDirectory(uploadDir);
 
-const imageDir = path.join(__dirname, '../public/images');
-createDirectory(imageDir);
-
 // Serve static files for images and music
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
-app.use('/images', express.static(path.join(__dirname, '../public/images')));
-
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // CORS configuration
 app.use(cors({
@@ -199,7 +194,6 @@ app.post('/upload', upload.single('file'), (req, res) => {
         res.status(400).send('No file uploaded.');
     }
 });
-
 
 // Route to delete files
 app.delete('/files/:id', authenticateToken, async (req, res) => {

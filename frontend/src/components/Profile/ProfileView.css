@@ -14,6 +14,7 @@
     height: 200px;
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
 }
 
 .profile-picture {
@@ -36,7 +37,7 @@
 .about-section {
     margin-top: 100px;
     padding: 20px;
-    background: #f9f9f9;
+    background: #050b29;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }

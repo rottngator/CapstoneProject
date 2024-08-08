@@ -4,7 +4,7 @@ const path = require('path');
 // Define storage location and file naming
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '../public/uploads')); // Ensure the path is correct
+        cb(null, path.join(__dirname, '/public/uploads')); // Ensure the path is correct
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + path.extname(file.originalname));

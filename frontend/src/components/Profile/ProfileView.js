@@ -13,12 +13,14 @@ const ProfileView = () => {
         name: '',
         username: '',
     });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:3000/user/profile', {
+                const response = await fetch(`http://localhost:3000/user/profile`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -27,38 +29,53 @@ const ProfileView = () => {
                 });
 
                 if (!response.ok) {
-                    console.error('Failed to fetch profile data:', response.statusText);
-                    return;
+                    throw new Error(`Failed to fetch profile data: ${response.statusText}`);
                 }
 
                 const data = await response.json();
                 setProfileData(data); // Directly set the data object
-                console.log(data);  // Log the fetched data
+                console.log('Profile data:', data);  // Log the fetched data
             } catch (error) {
                 console.error('Failed to fetch profile data:', error.message);
+                setError(error.message);
+            } finally {
+                setLoading(false);
             }
         };
-
         fetchProfileData();
     }, []);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    // Ensure URLs are correct and valid
+    const profilePictureUrl = `http://localhost:3000${profileData.profilePicture}`;
+    const bannerUrl = `http://localhost:3000${profileData.banner}`;
 
     return (
         <div className="container profile-container">
             <div className="profile-header">
-            <div className="background-image" 
-                style={{ backgroundImage: 
-                        `url(${profileData.banner ? `/images/${profileData.banner}` : ''})` }} 
-                > {console.log('Banner URL:', profileData.banner)} </div>
+                <div
+                    className="background-image"
+                    style={{ backgroundImage: `url(${bannerUrl})` }}
+                >
+                    {console.log('Banner URL:', bannerUrl)}
+                </div>
                 <div className="profile-picture">
-                    <img 
-                        src={`/images/${profileData.profilePicture || 'default.png'}`} 
-                        alt="Profile" 
-                        className="rounded-circle" 
+                    <img
+                        src={profilePictureUrl}
+                        alt="Profile"
+                        className="rounded-circle"
                     />
-                    {console.log('Profile Picture URL:', `${profileData.profilePicture || 'default.png'}`)}
+                    {console.log('Profile Picture URL:', profilePictureUrl)}
                 </div>
             </div>
-            
+
             <div className="about-section mt-3">
                 <h2>ABOUT</h2>
                 <p>{profileData.about}</p>
