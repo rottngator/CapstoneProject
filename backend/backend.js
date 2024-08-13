@@ -50,6 +50,11 @@ app.use(session({
 // Register Route
 app.post('/auth/register', async (req, res) => {
     const { username, email, password, passwordConfirmation } = req.body;
+
+    if (!password || !passwordConfirmation) {
+        return res.status(400).json({ message: 'Password and password confirmation are required' });
+    }
+
     if (password !== passwordConfirmation) {
         return res.status(400).json({ message: 'Passwords do not match' });
     }
@@ -67,6 +72,7 @@ app.post('/auth/register', async (req, res) => {
         res.status(500).json({ message: 'Internal server error', details: error.message });
     }
 });
+
 
 // Login Route
 app.post('/auth/login', async (req, res) => {
@@ -151,19 +157,20 @@ app.get('/user/tracks', authenticateToken, async (req, res) => {
 });
 
 // Search Suggestions Route
-app.get('/user/search', async (req, res) => {
-    const { query } = req.query;
-    try {
-        const users = await getUserByUsername(new RegExp(query, 'i'));
-        if (!users || users.length === 0) {
-            return res.status(404).json({ message: 'No users found' });
-        }
-        res.status(200).json(users);
-    } catch (error) {
-        console.error('Error searching users:', error);
-        res.status(500).json({ message: 'Internal server error', details: error.message });
-    }
-});
+
+// app.get('/user/search', async (req, res) => {
+//     const { query } = req.query;
+//     try {
+//         const users = await getUserByUsername(new RegExp(query, 'i'));
+//         if (!users || users.length === 0) {
+//             return res.status(404).json({ message: 'No users found' });
+//         }
+//         res.status(200).json(users);
+//     } catch (error) {
+//         console.error('Error searching users:', error);
+//         res.status(500).json({ message: 'Internal server error', details: error.message });
+//     }
+// });
 
 
 // Logout Route
@@ -178,7 +185,6 @@ app.post('/upload/music', authenticateToken, upload.single('file'), (req, res) =
         return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    // Assuming `bucket` is defined somewhere else
     const uploadStream = bucket.openUploadStream(req.file.originalname, {
         metadata: {
             title: req.body.title,
@@ -198,6 +204,7 @@ app.post('/upload/music', authenticateToken, upload.single('file'), (req, res) =
 
     uploadStream.end(req.file.buffer);
 });
+
 
 // Route to serve music files
 app.get('/files/:id', (req, res) => {
@@ -266,6 +273,21 @@ app.delete('/files/:id', authenticateToken, async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+// Route to fetch recently uploaded tracks
+app.get('/tracks/recent-tracks', async (req, res) => {
+    try {
+        // Replace with your actual logic to fetch recent tracks
+        const recentTracks = await getRecentTracksFromDatabase(); // Ensure this function is correctly defined
+
+        res.status(200).json(recentTracks);
+    } catch (error) {
+        console.error('Error fetching recent tracks:', error); // Log the error
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 
 // Route to feature a track
 app.put('/tracks/feature/:id', authenticateToken, async (req, res) => {

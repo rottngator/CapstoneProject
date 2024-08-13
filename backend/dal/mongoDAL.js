@@ -8,9 +8,11 @@ mongoose.connect(mongoURI, {
 })
     .then(() => {
         console.log('MongoDB connection established successfully.');
-        // Initialize GridFSBucket
-        bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
-            bucketName: 'tracks'
+        // Initialize GridFSBucket here
+        mongoose.connection.once('open', () => {
+            bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+                bucketName: 'tracks'
+            });
         });
     })
     .catch((err) => console.error('Failed to connect to MongoDB:', err));
@@ -53,11 +55,6 @@ const Event = mongoose.model('Event', eventSchema);
 
 // Define and initialize bucket
 let bucket;
-mongoose.connection.once('open', () => {
-    bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
-        bucketName: 'tracks'
-    });
-});
 
 // Export functions and models
 const createUser = async (userData) => {
@@ -68,8 +65,8 @@ const createUser = async (userData) => {
 
 const getUserByUsername = async (username) => {
     try {
-        const users = await User.find({ username: { $regex: username, $options: 'i' } });
-        return users;
+        const user = await User.findOne({ username: { $regex: new RegExp('^' + username + '$', 'i') } });
+        return user;
     } catch (error) {
         throw new Error('Error finding users');
     }
@@ -93,9 +90,14 @@ const deleteFileById = async (fileId) => {
     await bucket.delete(new mongoose.Types.ObjectId(fileId));
 };
 
+async function getRecentTracksFromDatabase() {
+    return Track.find() // Assuming you have a Track model
+        .sort({ createdAt: -1 }) // Sort by creation date, descending
+        .limit(10); // Limit the number of recent tracks
+}
+
 // Export models
-module.exports = 
-{ 
+module.exports = { 
     createUser, 
     getUserByUsername, 
     getUserById, 
@@ -103,4 +105,6 @@ module.exports =
     deleteFileById, 
     Track, 
     bucket, 
-    Event };
+    Event,
+    getRecentTracksFromDatabase 
+};

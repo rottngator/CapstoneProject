@@ -1,16 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
 
 const Home = () => {
     const navigate = useNavigate();
+    const [recentTracks, setRecentTracks] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Static data for recent tracks
-    const recentTracks = [
-        { id: '1', title: 'Track 1', artist: 'Artist 1', description: 'Description for Track 1' },
-        { id: '2', title: 'Track 2', artist: 'Artist 2', description: 'Description for Track 2' },
-        { id: '3', title: 'Track 3', artist: 'Artist 3', description: 'Description for Track 3' },
-    ];
+    useEffect(() => {
+        // Fetch recent tracks from the backend
+        const fetchRecentTracks = async () => {
+            try {
+                const response = await fetch('http://localhost:3000/tracks/recent-tracks'); // Update if necessary
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setRecentTracks(data);
+            } catch (error) {
+                setError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchRecentTracks();
+    }, []); // This dependency array ensures the effect runs once on component mount
 
     const handleCreateClick = () => {
         navigate('/upload');
@@ -56,25 +72,29 @@ const Home = () => {
 
                 <div className='recent-tracks'>
                     <h3>Recently Posted Tracks</h3>
-                    {recentTracks.length > 0 ? (
+                    {loading ? (
+                        <p>Loading...</p>
+                    ) : error ? (
+                        <p>Error: {error}</p>
+                    ) : recentTracks.length > 0 ? (
                         recentTracks.map(track => (
                             <div key={track.id} className='track'>
-                                <img src='/images/track.jpg' alt='recent track'/>
+                                <img src={track.coverImageUrl || '/images/track.jpg'} alt='recent track'/>
                                 <div className='track-info'>
                                     <h4>{track.title}</h4>
                                     <p>{track.artist}</p>
                                     <div className='track-details'>
                                         <div className='track-stats'>
                                             <div>Streams</div>
-                                            <div>00</div>
+                                            <div>{track.streams || '00'}</div>
                                         </div>
                                         <div className='track-stats'>
                                             <div>Likes</div>
-                                            <div>00</div>
+                                            <div>{track.likes || '00'}</div>
                                         </div>
                                         <div className='track-stats'>
                                             <div>Comments</div>
-                                            <div>00</div>
+                                            <div>{track.comments || '00'}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -83,7 +103,7 @@ const Home = () => {
                                     <h4>Lyrics</h4>
                                     <p>{track.description}</p>
                                 </div>
-                                <audio controls src={`/files/${track.id}`}></audio>
+                                <audio controls src={`/files/${track.audioFile}`}></audio>
                             </div>
                         ))
                     ) : (
