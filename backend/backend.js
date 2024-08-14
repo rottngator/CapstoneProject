@@ -7,8 +7,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
-const { createUser, getUserByUsername, getUserById, updateUserById, Track, bucket, Event, getRecentTracksFromDatabase } = require('./dal/mongoDAL');
-const { uploadImage, uploadMusic } = require('./multerUpload');
+const { createUser, getUserByUsername, getUserById, updateUserById, Track, bucket, Event } = require('./dal/mongoDAL');
+const upload = require('./multerUpload');
 const app = express();
 const JWT_SECRET = process.env.JWT_SECRET || 'nepenthe';
 
@@ -33,7 +33,7 @@ const createDirectory = (dir) => {
 const uploadDir = path.join(__dirname, '/public/uploads');
 createDirectory(uploadDir);
 
-// Serve static files for images
+// Serve static files for images and music
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // Middleware
@@ -72,6 +72,7 @@ app.post('/auth/register', async (req, res) => {
         res.status(500).json({ message: 'Internal server error', details: error.message });
     }
 });
+
 
 // Login Route
 app.post('/auth/login', async (req, res) => {
@@ -115,7 +116,7 @@ app.get('/user/profile', authenticateToken, async (req, res) => {
 });
 
 // Update route for the profile
-app.put('/user/profile', authenticateToken, imageUpload.fields([{ name: 'profilePicture' }, { name: 'banner' }]), async (req, res) => {
+app.put('/user/profile', authenticateToken, upload.fields([{ name: 'profilePicture' }, { name: 'banner' }]), async (req, res) => {
     try {
         const updates = req.body;
         if (req.files) {
@@ -155,6 +156,23 @@ app.get('/user/tracks', authenticateToken, async (req, res) => {
     }
 });
 
+// Search Suggestions Route
+
+// app.get('/user/search', async (req, res) => {
+//     const { query } = req.query;
+//     try {
+//         const users = await getUserByUsername(new RegExp(query, 'i'));
+//         if (!users || users.length === 0) {
+//             return res.status(404).json({ message: 'No users found' });
+//         }
+//         res.status(200).json(users);
+//     } catch (error) {
+//         console.error('Error searching users:', error);
+//         res.status(500).json({ message: 'Internal server error', details: error.message });
+//     }
+// });
+
+
 // Logout Route
 app.post('/auth/logout', (req, res) => {
     res.cookie('token', '', { maxAge: 1 });
@@ -162,7 +180,7 @@ app.post('/auth/logout', (req, res) => {
 });
 
 // Music File Upload Route
-app.post('/upload/music', authenticateToken, musicUpload.single('file'), (req, res) => {
+app.post('/upload/music', authenticateToken, upload.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
     }
@@ -187,6 +205,7 @@ app.post('/upload/music', authenticateToken, musicUpload.single('file'), (req, r
     uploadStream.end(req.file.buffer);
 });
 
+
 // Route to serve music files
 app.get('/files/:id', (req, res) => {
     const fileId = new mongoose.Types.ObjectId(req.params.id);
@@ -204,6 +223,7 @@ app.get('/files/:id', (req, res) => {
         res.status(404).json({ message: 'No file found' });
     });
 });
+
 
 // Route to fetch recently uploaded files including music
 app.get('/uploads', async (req, res) => {
@@ -234,27 +254,66 @@ app.get('/uploads', async (req, res) => {
     }
 });
 
+
+app.post('/upload', upload.single('file'), (req, res) => {
+    console.log('Uploaded file:', req.file);
+    if (req.file) {
+        res.json({ file: req.file });
+    } else {
+        res.status(400).send('No file uploaded.');
+    }
+});
+
 // Route to delete files
-app.delete('/uploads/:id', authenticateToken, async (req, res) => {
-    const fileId = req.params.id;
-    const isMusicFile = req.query.type === 'audio';
-
+app.delete('/files/:id', authenticateToken, async (req, res) => {
     try {
-        if (isMusicFile) {
-            const track = await Track.findById(fileId);
-            if (!track) return res.status(404).json({ message: 'File not found' });
-
-            // Delete the music file from GridFS
-            await bucket.delete(new mongoose.Types.ObjectId(fileId));
-        } else {
-            // Delete image files from local storage
-            const filePath = path.join(uploadDir, fileId);
-            if (fs.existsSync(filePath)) {
-                fs.unlinkSync(filePath);
-            }
-        }
-
+        await deleteFileById(req.params.id);
         res.status(200).json({ message: 'File deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// Route to fetch recently uploaded tracks
+app.get('/tracks/recent-tracks', async (req, res) => {
+    try {
+        // Replace with your actual logic to fetch recent tracks
+        const recentTracks = await getRecentTracksFromDatabase(); // Ensure this function is correctly defined
+
+        res.status(200).json(recentTracks);
+    } catch (error) {
+        console.error('Error fetching recent tracks:', error); // Log the error
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+
+// Route to feature a track
+app.put('/tracks/feature/:id', authenticateToken, async (req, res) => {
+    const trackId = req.params.id;
+    try {
+        await Track.updateMany({}, { $set: { isFeatured: false } });
+        const updatedTrack = await Track.findByIdAndUpdate(trackId, { isFeatured: true }, { new: true });
+        if (updatedTrack) {
+            res.status(200).json({ message: 'Track featured successfully' });
+        } else {
+            res.status(404).json({ message: 'Track not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+});
+
+// Route to display featured track
+app.get('/tracks/featured', async (req, res) => {
+    try {
+        const featuredTrack = await Track.findOne({ isFeatured: true }).sort({ createdAt: -1 });
+        if (featuredTrack) {
+            res.status(200).json(featuredTrack);
+        } else {
+            res.status(404).json({ message: 'No featured track found' });
+        }
     } catch (error) {
         res.status(500).json({ message: 'Internal server error' });
     }
@@ -340,7 +399,5 @@ app.delete('/events/:id', authenticateToken, async (req, res) => {
     }
 });
 
-// Start the server
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+// Start server
+app.listen(port, () => console.log(`Server running on port ${port}`));

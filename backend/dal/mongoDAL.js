@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const mongoURI = 'mongodb+srv://lunruh:Abby2525!@cluster0.ntcrjfg.mongodb.net/SoundHub';
-
 mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -57,29 +56,26 @@ const Event = mongoose.model('Event', eventSchema);
 // Define and initialize bucket
 let bucket;
 
-// Function to create a new user
+// Export functions and models
 const createUser = async (userData) => {
     const user = new User(userData);
     await user.save();
     return user;
 };
 
-// Function to get a user by username
 const getUserByUsername = async (username) => {
     try {
         const user = await User.findOne({ username: { $regex: new RegExp('^' + username + '$', 'i') } });
         return user;
     } catch (error) {
-        throw new Error('Error finding user');
+        throw new Error('Error finding users');
     }
 };
 
-// Function to get a user by ID
 const getUserById = async (id) => {
     return User.findById(id);
 };
 
-// Function to update a user by ID
 const updateUserById = async (id, updates) => {
     const user = await User.findById(id);
     if (!user) {
@@ -90,23 +86,17 @@ const updateUserById = async (id, updates) => {
     return user;
 };
 
-// Function to delete a file by its ID in GridFS
 const deleteFileById = async (fileId) => {
     await bucket.delete(new mongoose.Types.ObjectId(fileId));
 };
 
-// Function to fetch recent tracks
-const getRecentTracksFromDatabase = async () => {
-    try {
-        const recentTracks = await Track.find().sort({ createdAt: -1 }).limit(10); // Adjust the query as needed
-        return recentTracks;
-    } catch (error) {
-        console.error('Error fetching recent tracks:', error);
-        throw new Error('Could not fetch recent tracks');
-    }
-};
+async function getRecentTracksFromDatabase() {
+    return Track.find() // Assuming you have a Track model
+        .sort({ createdAt: -1 }) // Sort by creation date, descending
+        .limit(10); // Limit the number of recent tracks
+}
 
-// Export models and functions
+// Export models
 module.exports = { 
     createUser, 
     getUserByUsername, 
