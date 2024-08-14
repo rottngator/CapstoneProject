@@ -26,7 +26,7 @@ const Home = () => {
         };
 
         fetchRecentTracks();
-    }, []); // This dependency array ensures the effect runs once on component mount
+    }, []);
 
     const handleCreateClick = () => {
         navigate('/upload');
