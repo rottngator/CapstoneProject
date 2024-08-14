@@ -9,12 +9,11 @@ const Home = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Fetch recent tracks from the backend
         const fetchRecentTracks = async () => {
             try {
-                const response = await fetch('http://localhost:3000/tracks/recent-tracks'); // Update if necessary
+                const response = await fetch('http://localhost:3000/tracks/recent-tracks'); // Ensure this URL is correct
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    throw new Error('Network response was not ok: ' + response.statusText);
                 }
                 const data = await response.json();
                 setRecentTracks(data);
@@ -26,7 +25,7 @@ const Home = () => {
         };
 
         fetchRecentTracks();
-    }, []); // This dependency array ensures the effect runs once on component mount
+    }, []);
 
     const handleCreateClick = () => {
         navigate('/upload');
@@ -38,6 +37,7 @@ const Home = () => {
                 <div className='sidebar-left'>
                     <div className='public-chatrooms'>
                         <h3>Public Chatrooms</h3>
+                        {/* Populate chatrooms dynamically if applicable */}
                         <div className='chatroom'>Chat</div>
                         <div className='chatroom'>Chat</div>
                         <div className='chatroom'>Chat</div>
@@ -45,6 +45,7 @@ const Home = () => {
                     </div>
                     <div className='following'>
                         <h3>Following</h3>
+                        {/* Populate following users dynamically if applicable */}
                         <div className='user'>
                             <div className='status'>
                                 @USERNAME
@@ -113,6 +114,7 @@ const Home = () => {
 
                 <div className='sidebar-right'>
                     <h3>Sound Hub News</h3>
+                    {/* Populate news items dynamically if applicable */}
                     <div className='news-item'>text text text...</div>
                     <div className='news-item'>text text text...</div>
                     <div className='news-item'>text text text...</div>

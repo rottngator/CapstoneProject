@@ -38,40 +38,37 @@ const MusicUpload = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-    
+
         if (!file) {
             setError('Please select a file to upload.');
             return;
         }
-    
-        console.log('Submitting file:', file); // Debugging line
-    
+
         const formData = new FormData();
         formData.append('file', file);
         formData.append('title', title);
         formData.append('artist', artist);
         formData.append('description', description);
-    
+
         try {
             const response = await fetch('http://localhost:3000/upload', {
                 method: 'POST',
                 credentials: 'include',
                 body: formData,
             });
-    
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Something went wrong');
             }
-    
+
             const data = await response.json();
             setFileUrl(`http://localhost:3000${data.fileUrl}`);
+            setError(''); // Clear any previous errors
         } catch (err) {
             setError(err.message);
         }
     };
-    
-    
 
     return (
         <div className="upload-container">

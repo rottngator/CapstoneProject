@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const fs = require('fs');
-const { createUser, getUserByUsername, getUserById, updateUserById, Track, bucket, Event } = require('./dal/mongoDAL');
+const { createUser, getUserByUsername, getUserById, updateUserById, Track, bucket, Event, getRecentTracksFromDatabase } = require('./dal/mongoDAL');
 const upload = require('./multerUpload');
 const app = express();
 const JWT_SECRET = process.env.JWT_SECRET || 'nepenthe';
@@ -274,20 +274,35 @@ app.delete('/files/:id', authenticateToken, async (req, res) => {
     }
 });
 
+
 // Route to fetch recently uploaded tracks
 app.get('/tracks/recent-tracks', async (req, res) => {
     try {
-        // Replace with your actual logic to fetch recent tracks
-        const recentTracks = await getRecentTracksFromDatabase(); // Ensure this function is correctly defined
+        // Get all files in the uploads directory
+        const files = fs.readdirSync(uploadDir);
 
-        res.status(200).json(recentTracks);
+        // Filter out files that are not audio files (you might need to adjust this filter based on your file naming convention)
+        const audioFiles = files.filter(file => file.endsWith('.mp3') || file.endsWith('.wav')); // Adjust extensions as needed
+
+        // Construct an array of track objects with metadata
+        const tracks = audioFiles.map((file, index) => ({
+            id: index + 1,  // Simple numeric ID, you can modify this to be more unique
+            title: file,    // Use the file name as the title
+            artist: 'Unknown Artist',  // Placeholder artist, you might want to read this from the file or add metadata
+            description: 'No description available', // Placeholder description
+            coverImageUrl: '/images/track.jpg',  // Default cover image path
+            audioFile: file,  // The filename of the audio file
+            streams: 0,  // Placeholder streams count
+            likes: 0,    // Placeholder likes count
+            comments: 0  // Placeholder comments count
+        }));
+
+        res.status(200).json(tracks);
     } catch (error) {
-        console.error('Error fetching recent tracks:', error); // Log the error
-        res.status(500).json({ message: 'Internal server error' });
+        console.error('Error fetching recent tracks:', error);
+        res.status(500).json({ message: 'Internal server error', details: error.message });
     }
 });
-
-
 
 // Route to feature a track
 app.put('/tracks/feature/:id', authenticateToken, async (req, res) => {
