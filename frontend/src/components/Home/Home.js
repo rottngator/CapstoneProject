@@ -72,45 +72,52 @@ const Home = () => {
                 </div>
 
                 <div className='recent-tracks'>
-                    <h3>Recently Posted Tracks</h3>
-                    {loading ? (
-                        <p>Loading...</p>
-                    ) : error ? (
-                        <p>Error: {error}</p>
-                    ) : recentTracks.length > 0 ? (
-                        recentTracks.map(track => (
-                            <div key={track.id} className='track'>
-                                <img src={track.coverImageUrl || '/images/track.jpg'} alt='recent track'/>
-                                <div className='track-info'>
-                                    <h4>{track.title}</h4>
-                                    <p>{track.artist}</p>
-                                    <div className='track-details'>
-                                        <div className='track-stats'>
-                                            <div>Streams</div>
-                                            <div>{track.streams || '00'}</div>
-                                        </div>
-                                        <div className='track-stats'>
-                                            <div>Likes</div>
-                                            <div>{track.likes || '00'}</div>
-                                        </div>
-                                        <div className='track-stats'>
-                                            <div>Comments</div>
-                                            <div>{track.comments || '00'}</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className='lyrics'>
-                                    <h4>Lyrics</h4>
-                                    <p>{track.description}</p>
-                                </div>
-                                <audio controls src={`/files/${track.audioFile}`}></audio>
-                            </div>
-                        ))
-                    ) : (
-                        <p>No recent tracks available</p>
-                    )}
+    <h3>Recently Posted Tracks</h3>
+    {loading ? (
+        <p>Loading...</p>
+    ) : error ? (
+        <p>Error: {error}</p>
+    ) : recentTracks.length > 0 ? (
+        recentTracks.map(track => (
+            <div key={track.id} className='track'>
+                <img src={track.coverImageUrl || '/images/track.jpg'} alt='recent track'/>
+                <div className='track-info'>
+                    <h4>{track.title}</h4>
+                    <p>{track.artist}</p>
+                    <div className='track-details'>
+                        <div className='track-stats'>
+                            <div>Streams</div>
+                            <div>{track.streams || '00'}</div>
+                        </div>
+                        <div className='track-stats'>
+                            <div>Likes</div>
+                            <div>{track.likes || '00'}</div>
+                        </div>
+                        <div className='track-stats'>
+                            <div>Comments</div>
+                            <div>{track.comments || '00'}</div>
+                        </div>
+                    </div>
                 </div>
+
+                <div className='lyrics'>
+                    <h4>Lyrics</h4>
+                    <p>{track.description}</p>
+                </div>
+
+                {/* Place the audio element here */}
+                <audio controls>
+                    <source src={`http://localhost:3000/uploads/${track.audioFile}`} type="audio/mpeg" />
+                    Your browser does not support the audio element.
+                </audio>
+
+            </div>
+        ))
+    ) : (
+        <p>No recent tracks available</p>
+    )}
+</div>
+
 
                 <div className='sidebar-right'>
                     <h3>Sound Hub News</h3>
