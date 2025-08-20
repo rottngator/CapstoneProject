@@ -48,20 +48,20 @@ const Home = () => {
                         {/* Populate following users dynamically if applicable */}
                         <div className='user'>
                             <div className='status'>
-                                @USERNAME
-                                <span>streaming: alkaline</span>
+                                @BillionSweets
+                                <span>Streaming: Cowboys from Hell</span>
                             </div>
                         </div>
                         <div className='user'>
                             <div className='status'>
-                                @USERNAME
-                                <span>streaming: dial tone</span>
+                                @cowpoke_killer_
+                                <span>Streaming: The Devil Wears a Suit and Tie</span>
                             </div>
                         </div>
                         <div className='user'>
                             <div className='status'>
-                                @USERNAME
-                                <span>streaming: glowworms</span>
+                                @YellowYoCat
+                                <span>Streaming: </span>
                             </div>
                         </div>
                     </div>
@@ -105,7 +105,7 @@ const Home = () => {
                     <p>{track.description}</p>
                 </div>
 
-                {/* Place the audio element here */}
+                
                 <audio controls>
                     <source src={`http://localhost:3000/uploads/${track.audioFile}`} type="audio/mpeg" />
                     Your browser does not support the audio element.
@@ -122,10 +122,25 @@ const Home = () => {
                 <div className='sidebar-right'>
                     <h3>Sound Hub News</h3>
                     {/* Populate news items dynamically if applicable */}
-                    <div className='news-item'>text text text...</div>
-                    <div className='news-item'>text text text...</div>
-                    <div className='news-item'>text text text...</div>
-                    <div className='news-item'>text text text...</div>
+                    <div className='news-item'>Breaking news, Ken of Barbie is still at large.</div>
+                    <div className='news-item'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+                        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad 
+                        minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea 
+                        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit 
+                        esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat 
+                        non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+                        <div className='news-item'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+                        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad 
+                        minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea 
+                        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit 
+                        esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat 
+                        non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
+                        <div className='news-item'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+                        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad 
+                        minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea 
+                        commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit 
+                        esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat 
+                        non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
                 </div>
             </div>
         </div>

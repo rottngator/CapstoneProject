@@ -16,7 +16,7 @@ const port = 3000;
 
 // CORS configuration
 app.use(cors({
-    origin: 'http://localhost:3001',  // Your frontend origin
+    origin: 'http://localhost:3001',  // frontend origin
     methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Allowed methods
     credentials: true
 }));
