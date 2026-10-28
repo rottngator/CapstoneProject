@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { apiUrl, authHeaders } from '../../api';
 
 export const UserContext = createContext();
 
@@ -7,26 +8,20 @@ export const UserProvider = ({ children }) => {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const token = localStorage.getItem('token'); // Get token from localStorage
-            if (token) {
-                try {
-                    const response = await fetch('http://localhost:3000/user/profile', {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                        },
-                        credentials: 'include',
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        setUser(data);
-                    }
-                } catch (error) {
-                    console.error('Failed to fetch user:', error);
+            if (!localStorage.getItem('token')) return;
+            try {
+                const response = await fetch(apiUrl('/user/profile'), {
+                    headers: authHeaders(),
+                });
+                if (response.ok) {
+                    setUser(await response.json());
+                } else if (response.status === 401) {
+                    localStorage.removeItem('token');
                 }
+            } catch (error) {
+                console.error('Failed to fetch user:', error);
             }
         };
-
         fetchUser();
     }, []);
 
@@ -36,5 +31,3 @@ export const UserProvider = ({ children }) => {
         </UserContext.Provider>
     );
 };
-
-// #0b0113

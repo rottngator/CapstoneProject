@@ -1,145 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { apiUrl, authHeaders } from '../../api';
 import './ProfileView.css';
 
 const ProfileView = () => {
-    const [profileData, setProfileData] = useState({
-        profilePicture: '',
-        banner: '',
-        about: '',
-        pronouns: '',
-        location: '',
-        label: '',
-        name: '',
-        username: '',
-    });
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [profile, setProfile] = useState(null);
     const [tracks, setTracks] = useState([]);
-
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        const fetchProfileData = async () => {
+        const loadProfile = async () => {
             try {
-                const token = localStorage.getItem('token');
-                
-                // Fetch profile data
-                const profileResponse = await fetch(`http://localhost:3000/user/profile`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-    
-                if (!profileResponse.ok) {
-                    throw new Error(`Failed to fetch profile data: ${profileResponse.statusText}`);
-                }
-    
-                const profileData = await profileResponse.json();
-                setProfileData(profileData);
-    
-                // Fetch user's uploaded tracks
-                const tracksResponse = await fetch(`http://localhost:3000/user/tracks`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
-    
-                if (!tracksResponse.ok) {
-                    throw new Error(`Failed to fetch tracks: ${tracksResponse.statusText}`);
-                }
-    
-                const tracksData = await tracksResponse.json();
-                setTracks(tracksData);
-    
-            } catch (error) {
-                console.error('Failed to fetch data:', error.message);
-                setError(error.message);
+                const headers = authHeaders();
+                const [profileResponse, tracksResponse] = await Promise.all([
+                    fetch(apiUrl('/user/profile'), { headers }),
+                    fetch(apiUrl('/user/tracks'), { headers }),
+                ]);
+                if (!profileResponse.ok) throw new Error('Could not load your profile.');
+                if (!tracksResponse.ok) throw new Error('Could not load your tracks.');
+                setProfile(await profileResponse.json());
+                setTracks(await tracksResponse.json());
+            } catch (loadError) {
+                setError(loadError.message);
             } finally {
                 setLoading(false);
             }
         };
-        fetchProfileData();
-    }, []);    
+        loadProfile();
+    }, []);
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+    if (loading) return <main className="page-shell"><p className="status-message">Loading your profile…</p></main>;
+    if (error) return <main className="page-shell"><p className="status-message error-message">{error}</p></main>;
 
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
-
-    
-
-    // Ensure URLs are correct and valid
-    const profilePictureUrl = `http://localhost:3000${profileData.profilePicture}`;
-    const bannerUrl = `http://localhost:3000${profileData.banner}`;
+    const photo = profile.profilePicture ? apiUrl(profile.profilePicture) : '';
+    const banner = profile.banner ? apiUrl(profile.banner) : '';
+    const latestTrack = tracks[0];
 
     return (
-        <div className="container profile-container">
-            <div className="profile-header">
-                <div
-                    className="background-image"
-                    style={{ backgroundImage: `url(${bannerUrl})` }}
-                >
-                    {console.log('Banner URL:', bannerUrl)}
+        <main className="page-shell profile-page">
+            <section className="profile-cover" style={banner ? { backgroundImage: `linear-gradient(90deg, rgba(20,14,32,.65), rgba(20,14,32,.05)), url("${banner}")` } : undefined}>
+                <span className="profile-cover-label">SOUND HUB / ARTIST PROFILE</span>
+                <Link className="button button-outline profile-edit-link" to="/edit">Edit profile</Link>
+            </section>
+            <section className="profile-summary surface-card">
+                <div className="profile-identity">
+                    <div className="profile-avatar">{photo ? <img src={photo} alt={`${profile.name || profile.username}'s profile`} /> : (profile.username || 'S').slice(0, 1).toUpperCase()}</div>
+                    <p className="eyebrow">ARTIST PROFILE</p>
+                    <h1>{profile.name || profile.username}</h1>
+                    <p className="profile-handle">@{profile.username}{profile.pronouns ? ` · ${profile.pronouns}` : ''}</p>
+                    {profile.location && <p className="profile-location">{profile.location}</p>}
+                    {profile.label && <span className="profile-label">{profile.label}</span>}
                 </div>
-                <div className="profile-picture">
-                    <img
-                        src={profilePictureUrl}
-                        alt="Profile"
-                        className="rounded-circle"
-                    />
-                    {console.log('Profile Picture URL:', profilePictureUrl)}
+                <div className="profile-bio">
+                    <p className="eyebrow">THE PERSON BEHIND THE MUSIC</p>
+                    <h2>About</h2>
+                    <p>{profile.about || 'This artist is letting the music do the talking.'}</p>
                 </div>
-            </div>
-
-            <div className="about-section mt-3">
-                <h2>ABOUT</h2>
-                <p>{profileData.about}</p>
-            </div>
-            <div className="profile-content row">
-                <div className="profile-info col-md-4">
-                    <h1>{profileData.name}</h1>
-                    <h2>@{profileData.username}</h2>
-                    <p>{profileData.label}</p>
-                    <p>Links: <a href="#link">Link 1</a>, <a href="#link">Link 2</a></p>
-                    <div className="follow-info">
-                        <div>Following<br />00</div>
-                        <div>Followers<br />00</div>
+                <div className="profile-spotlight">
+                    <div className="profile-spotlight-heading">
+                        <div><p className="eyebrow">ON REPEAT</p><h2>Latest release</h2></div>
+                        <span className="profile-track-count">{tracks.length} {tracks.length === 1 ? 'track' : 'tracks'}</span>
                     </div>
+                    {latestTrack ? (
+                        <div className="profile-spotlight-track">
+                            <img src={latestTrack.coverImageUrl ? apiUrl(latestTrack.coverImageUrl) : '/images/track.jpg'} alt="" />
+                            <div><strong>{latestTrack.title}</strong><span>{latestTrack.artist}</span></div>
+                            <audio controls preload="none" aria-label={`Play ${latestTrack.title}`}><source src={apiUrl(latestTrack.path)} /></audio>
+                        </div>
+                    ) : (
+                        <p className="profile-no-track">Your first release will appear here.</p>
+                    )}
                 </div>
-                <div className="profile-details col-md-8">
-                    <div className="bio-section">
-                        <h2>BIO</h2>
-                        <p>PRONOUNS: {profileData.pronouns}</p>
-                        <p>LOCATION: {profileData.location}</p>
-                        <p>LABEL: {profileData.label}</p>
-                    </div>
-                    <div className="tracks-section">
-                        <h2>TRACKS</h2>
-                        {tracks.length === 0 ? (
-                            <p>No tracks uploaded yet.</p>
-                        ) : (
-                            tracks.map(track => (
-                                <div key={track._id} className="track">
-                                    <audio controls>
-                                        <source src={`http://localhost:3000${track.path}`} type="audio/mpeg" />
-                                        Your browser does not support the audio element.
-                                    </audio>
-                                    <p>{track.title} by {track.artist}</p>
-                                    <p>{track.description}</p>
-                                </div>
-                            ))
-                        )}
-                    </div>
+            </section>
+            <section className="profile-tracks">
+                <div className="section-heading">
+                    <div><p className="eyebrow">MADE BY YOU</p><h2>Your releases</h2></div>
+                    <Link to="/upload" className="button button-primary">＋ Upload track</Link>
                 </div>
-            </div>
-        </div>
+                {tracks.length === 0 ? (
+                    <div className="empty-tracks"><span className="empty-icon">♫</span><h3>Your first release belongs here.</h3><p>When you upload a track, it’ll show up on your profile.</p></div>
+                ) : (
+                    <div className="profile-track-list">
+                        {tracks.map((track) => (
+                            <article className="profile-track surface-card" key={track.id}>
+                                <span className="track-list-art">♫</span>
+                                <div className="profile-track-copy"><h3>{track.title}</h3><p>{track.artist}{track.description ? ` · ${track.description}` : ''}</p></div>
+                                <audio controls preload="none" aria-label={`Play ${track.title}`}><source src={apiUrl(track.path)} /></audio>
+                            </article>
+                        ))}
+                    </div>
+                )}
+            </section>
+        </main>
     );
 };
 

@@ -1,19 +1,9 @@
-.event-details {
-    background-color: #15021e;
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    max-width: 600px;
-    margin: 50px auto;
-}
-
-.event-details h1 {
-    font-size: 2rem;
-    margin-bottom: 20px;
-}
-
-.event-details p {
-    font-size: 1.2rem;
-    margin: 10px 0;
-}
+.event-details-page { max-width: 860px; padding-top: 35px; }
+.event-details-page > .text-link { display: inline-block; margin-bottom: 20px; }
+.event-details { padding: clamp(26px, 5vw, 54px); }
+.event-details h1 { margin: 0 0 24px; font-size: clamp(36px, 6vw, 58px); font-weight: 750; letter-spacing: -.06em; }
+.event-detail-meta { display: flex; flex-wrap: wrap; gap: 10px; }
+.event-detail-meta span { padding: 8px 11px; border: 1px solid var(--line); border-radius: 9px; color: #d2cbdc; font-size: 11px; }
+.event-detail-description { margin-top: 35px; padding-top: 23px; border-top: 1px solid var(--line); }
+.event-detail-description h2 { margin-bottom: 8px; font-size: 15px; }
+.event-detail-description p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.75; }

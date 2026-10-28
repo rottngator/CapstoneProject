@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from './UserContext';
-import './Register.css'; // Ensure this is imported for styling
+import './Register.css';
+import { apiUrl } from '../../api';
 
 const Register = () => {
     const [username, setUsername] = useState('');
@@ -21,7 +22,7 @@ const Register = () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/auth/register', {
+            const response = await fetch(apiUrl('/auth/register'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -34,29 +35,32 @@ const Register = () => {
                 throw new Error(errorData.message || 'Registration failed');
             }
 
-            const userData = await response.json();
-            localStorage.setItem('token', userData.token); // storing the token in localStorage
-            setUser(userData);
+            const { token, user } = await response.json();
+            localStorage.setItem('token', token);
+            setUser(user);
             navigate('/');
         } catch (error) {
             console.error('Registration error:', error);
-            setError('Registration failed. Please try again.');
+            setError(error.message || 'Registration failed. Please try again.');
         }
     };
 
     return (
         <div className="register-page">
             <div className="logo-container">
-                <img src="/images/The Sound Hub Logo.png" alt="Logo" className="logo" />
+                <img src="/images/The Sound Hub Logo.png" alt="The Sound Hub logo" className="logo" />
+                <p>Independent sounds.<br /><span>Shared loudly.</span></p>
             </div>
             <div className="register-form-container">
-                <h1>Create an Account</h1>
+                <p className="eyebrow">FIND YOUR PEOPLE</p>
+                <h1>Create your account</h1>
                 <form onSubmit={handleSubmit} className="register-form">
                     <div className="form-group">
                         <label htmlFor="username">Username</label>
                         <input
                             id="username"
                             type="text"
+                            autoComplete="username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="Enter your username"
@@ -68,6 +72,7 @@ const Register = () => {
                         <input
                             id="email"
                             type="email"
+                            autoComplete="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Enter your email"
@@ -79,6 +84,7 @@ const Register = () => {
                         <input
                             id="password"
                             type="password"
+                            autoComplete="new-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter your password"
@@ -90,6 +96,7 @@ const Register = () => {
                         <input
                             id="passwordConfirmation"
                             type="password"
+                            autoComplete="new-password"
                             value={passwordConfirmation}
                             onChange={(e) => setPasswordConfirmation(e.target.value)}
                             placeholder="Confirm your password"
@@ -99,6 +106,7 @@ const Register = () => {
                     {error && <p className="error">{error}</p>}
                     <button type="submit" className="register-button">Register</button>
                 </form>
+                <p className="register-link">Already part of Sound Hub? <Link to="/login">Log in</Link></p>
             </div>
         </div>
     );

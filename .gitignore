@@ -128,3 +128,11 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Go build artifacts
+/backend/soundhub
+/backend/soundhub.exe
+/backend/*.test
+
+# Local uploads are served by the API and should not be committed.
+/backend/public/uploads/*

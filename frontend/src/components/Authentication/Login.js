@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from './UserContext';
-import './Login.css'; // Ensure this is imported for styling
+import './Login.css';
+import { apiUrl } from '../../api';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -14,13 +15,12 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const response = await fetch('http://localhost:3000/auth/login', {
+            const response = await fetch(apiUrl('/auth/login'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, password }),
-                credentials: 'include',
             });
 
             if (!response.ok) {
@@ -28,33 +28,37 @@ const Login = () => {
                 throw new Error(errorData.message || 'Login failed');
             }
 
-            const { token } = await response.json();
+            const { token, user } = await response.json();
             localStorage.setItem('token', token);
-            setUser({ token });
+            setUser(user);
             navigate('/');
         } catch (error) {
             console.error('Login error:', error);
-            setError('Login failed. Please try again.');
+            setError(error.message || 'Login failed. Please try again.');
         }
     };
 
     return (
         <div className="login-page">
             <div className="logo-container">
-                <img src="/images/The Sound Hub Logo.png" alt="Logo" className="logo" />
+                <img src="/images/The Sound Hub Logo.png" alt="The Sound Hub logo" className="logo" />
+                <p>Independent sounds.<br /><span>Shared loudly.</span></p>
             </div>
             <div className="login-container">
-                <h1>Welcome Back!</h1>
-                <h2>Login to your account</h2>
+                <p className="eyebrow">WELCOME BACK</p>
+                <h1>Log in</h1>
+                <h2>Pick up where you left off.</h2>
                 <form onSubmit={handleSubmit} className="form">
                     <div className="input-group">
                         <label htmlFor="username">Username</label>
                         <input
                             id="username"
                             type="text"
+                            autoComplete="username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="Enter your username"
+                            required
                         />
                     </div>
                     <div className="input-group">
@@ -62,18 +66,17 @@ const Login = () => {
                         <input
                             id="password"
                             type="password"
+                            autoComplete="current-password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Enter your password"
+                            required
                         />
                     </div>
                     {error && <p className="error">{error}</p>}
                     <button type="submit" className="login-button">Login</button>
                 </form>
-                <div className="register-link">
-                    <p>Don't have an account?</p>
-                    <button className="register-button" onClick={() => navigate('/register')}>Register</button>
-                </div>
+                <p className="register-link">New to Sound Hub? <Link to="/register">Create an account</Link></p>
             </div>
         </div>
     );

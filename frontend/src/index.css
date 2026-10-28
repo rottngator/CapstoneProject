@@ -1,15 +1,180 @@
+:root {
+  color-scheme: dark;
+  --ink: #fbf8ff;
+  --muted: #b9afc4;
+  --subtle: #93879f;
+  --canvas: #0c0711;
+  --surface: #160e1d;
+  --surface-raised: #20152a;
+  --line: rgba(231, 211, 255, 0.16);
+  --violet: #c69aff;
+  --violet-deep: #8d43e8;
+  --coral: #ff847b;
+  --green: #84d9b3;
+  --radius: 20px;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { min-width: 320px; background: var(--canvas); }
+
 body {
+  min-width: 320px;
   margin: 0;
-  font-family: 'Arial', sans-serif;
-  background-color: #0b0113;
-  color: white;
+  background:
+    radial-gradient(ellipse at 84% -16%, rgba(117, 45, 172, 0.16), transparent 38rem),
+    radial-gradient(ellipse at 4% 46%, rgba(81, 35, 108, 0.08), transparent 34rem),
+    var(--canvas);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
 }
 
-h3 {
-  margin: 0;
-  padding-bottom: 1rem;
+button, input, textarea, select { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+a { color: inherit; text-decoration: none; }
+button { color: inherit; }
+img { display: block; max-width: 100%; }
+h1, h2, h3, h4, p { margin-top: 0; }
+h1, h2, h3, h4 { color: var(--ink); letter-spacing: -0.035em; }
+
+::selection { background: rgba(167, 139, 250, 0.35); color: white; }
+
+:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 3px;
 }
 
-h4 {
+.page-shell {
+  width: min(1240px, calc(100% - 64px));
+  margin: 0 auto;
+  padding: 46px 0 68px;
+}
+
+.surface-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, rgba(31, 21, 40, 0.96), rgba(20, 13, 27, 0.98));
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.2);
+}
+
+.eyebrow {
+  margin-bottom: 10px;
+  color: var(--violet);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 17px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.button:hover { transform: translateY(-1px); }
+.button:focus-visible, .icon-button:focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; }
+.button:disabled { cursor: wait; opacity: 0.65; transform: none; }
+.button-primary { background: var(--violet-deep); color: white; }
+.button-primary:hover { background: #8d6cf0; color: white; }
+.button-outline { border-color: rgba(225, 203, 255, 0.34); background: rgba(255,255,255,0.025); color: var(--ink); }
+.button-outline:hover { border-color: rgba(167,139,250,.55); background: rgba(167,139,250,.08); color: white; }
+.button-light { background: #f5f2fb; color: #1d1725; }
+.button-light:hover { background: white; color: #1d1725; }
+
+.text-link { color: var(--violet); font-size: 13px; font-weight: 650; }
+.text-link:hover { color: #c5b4ff; }
+.status-message { padding: 22px 0; color: var(--muted); }
+.error-message, .form-error { color: #ff9a94; }
+.empty-state { margin: 60px auto; padding: 52px; text-align: center; }
+.empty-state h1 { font-size: clamp(30px, 5vw, 48px); }
+
+.field-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #d9d3e2;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.field-label > span { color: var(--subtle); font-size: 11px; font-weight: 450; }
+.field-label input, .field-label textarea, .upload-form input, .upload-form textarea {
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  outline: none;
+  background: #141119;
+  color: var(--ink);
+  font-size: 13px;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.field-label input:focus, .field-label textarea:focus, .upload-form input:focus, .upload-form textarea:focus {
+  border-color: rgba(167,139,250,.7);
+  box-shadow: 0 0 0 3px rgba(167,139,250,.12);
+}
+
+.field-label input::placeholder, .field-label textarea::placeholder, .upload-form input::placeholder, .upload-form textarea::placeholder { color: #716a7d; }
+.field-label textarea, .upload-form textarea { resize: vertical; }
+.field-label input[type="file"], .upload-form input[type="file"] { padding: 9px; color: var(--muted); }
+.field-label input[type="file"]::file-selector-button, .upload-form input[type="file"]::file-selector-button {
+  margin-right: 10px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: #30283b;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.form-error { margin: 14px 0 0; font-size: 13px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.field-span { grid-column: 1 / -1; }
+
+audio { width: 100%; height: 34px; accent-color: var(--violet); }
+audio::-webkit-media-controls-panel { background: #282331; }
+
+.page-shell > .status-message {
   margin: 0;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(22, 14, 29, .8);
+}
+
+.page-shell > .status-message.error-message {
+  border-color: rgba(255, 132, 123, .24);
+  background: rgba(97, 40, 48, .16);
+}
+
+.field-label input:disabled, .field-label textarea:disabled { cursor: not-allowed; opacity: .65; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+@media (max-width: 720px) {
+  .page-shell { width: min(100% - 36px, 560px); padding: 32px 0 48px; }
+  .form-grid { grid-template-columns: 1fr; gap: 16px; }
+  .field-span { grid-column: auto; }
+  .empty-state { padding: 34px 22px; }
 }

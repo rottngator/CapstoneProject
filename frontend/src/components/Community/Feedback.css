@@ -1,68 +1,10 @@
-.feedback-form {
-    background-color: #1a1a2e;
-    color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    width: 50%;
-    margin: 0 auto;
-    text-align: center;
-    font-family: Arial, sans-serif;
-}
-
-.feedback-form h1 {
-    font-size: 2em;
-    margin-bottom: 10px;
-}
-
-.feedback-form p {
-    margin: 10px 0;
-}
-
-.feedback-form form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.feedback-form label {
-    margin: 10px 0;
-}
-
-.feedback-form textarea {
-    width: 80%;
-    height: 100px;
-    margin: 10px 0;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1em;
-}
-
-.button-group {
-    display: flex;
-    justify-content: space-between;
-    width: 80%;
-    margin-top: 20px;
-}
-
-.cancel-button, .submit-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 1em;
-    cursor: pointer;
-}
-
-.cancel-button {
-    background-color: #555;
-    color: #fff;
-}
-
-.submit-button {
-    background-color: #4CAF50;
-    color: #fff;
-}
-
-.cancel-button:hover, .submit-button:hover {
-    opacity: 0.8;
-}
+.feedback-page { display: grid; min-height: calc(100vh - 76px); place-items: center; }
+.feedback-form { width: min(100%, 660px); padding: clamp(25px, 5vw, 46px); }
+.feedback-spark { display: grid; width: 45px; height: 45px; place-items: center; margin: 24px 0 14px; border-radius: 14px; background: rgba(255,132,123,.12); color: var(--coral); font-size: 23px; }
+.feedback-form h1 { margin-bottom: 9px; font-size: clamp(34px, 5vw, 48px); font-weight: 750; line-height: 1.05; letter-spacing: -.06em; }
+.feedback-lede { margin-bottom: 25px; color: var(--muted); font-size: 13px; }
+.feedback-form form { display: block; }
+.feedback-form .field-label textarea { margin-top: 2px; min-height: 145px; }
+.feedback-form-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 14px; }
+.feedback-form-footer > span { color: var(--subtle); font-size: 10px; }
+.feedback-success { margin: 17px 0 0; color: var(--green); font-size: 12px; }

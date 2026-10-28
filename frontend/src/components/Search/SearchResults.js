@@ -1,77 +1,61 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { apiUrl } from '../../api';
 import './SearchResults.css';
 
 const SearchResults = () => {
     const location = useLocation();
+    const query = new URLSearchParams(location.search).get('query') || '';
     const [results, setResults] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const query = new URLSearchParams(location.search).get('query');
+    const [loading, setLoading] = useState(Boolean(query));
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        const fetchResults = async () => {
+        if (!query.trim()) {
+            setLoading(false);
+            setResults([]);
+            return undefined;
+        }
+        const controller = new AbortController();
+        const loadResults = async () => {
             setLoading(true);
+            setError('');
             try {
-                const response = await fetch(`http://localhost:3000/search?query=${encodeURIComponent(query)}`);
-                if (!response.ok) {
-                    throw new Error('Failed to fetch results');
-                }
+                const response = await fetch(apiUrl(`/search?query=${encodeURIComponent(query)}`), { signal: controller.signal });
                 const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Could not search artists.');
                 setResults(data);
-            } catch (error) {
-                setError(error.message);
+            } catch (searchError) {
+                if (searchError.name !== 'AbortError') setError(searchError.message);
             } finally {
-                setLoading(false);
+                if (!controller.signal.aborted) setLoading(false);
             }
         };
-
-        if (query) {
-            fetchResults();
-        }
+        loadResults();
+        return () => controller.abort();
     }, [query]);
 
-    if (loading) {
-        return <div className="loading-spinner">Loading...</div>;
-    }
-
-    if (error) {
-        return <div className="error-message">Error: {error}</div>;
-    }
-
-    if (results.length === 0) {
-        return <div className="no-results-message">No results found for "{query}"</div>;
-    }
-
     return (
-        <div className="search-results-container">
-            <h2>Search Results for "{query}"</h2>
-            <ul className="results-list">
-                {results.map((result, index) => (
-                    <li key={index} className="result-item">
-                        <img src={result.avatarUrl || '/images/default-avatar.png'} alt={`${result.username}'s avatar`} className="result-avatar" />
-                        <div className="result-info">
-                            <h3 className="result-username">
-                                {highlightText(result.username, query)}
-                            </h3>
-                            <p className="result-details">
-                                {highlightText(result.bio, query)}
-                            </p>
-                        </div>
-                    </li>
-                ))}
-            </ul>
-        </div>
+        <main className="page-shell search-results-container">
+            <p className="eyebrow">FIND YOUR PEOPLE</p>
+            <h1>{query ? <>Artists for “{query}”</> : 'Find an artist'}</h1>
+            {!query && <p className="search-hint">Search the Sound Hub community by artist name using the search bar above.</p>}
+            {loading ? <p className="status-message">Looking around the community…</p> : null}
+            {error ? <p className="status-message error-message">{error}</p> : null}
+            {!loading && !error && !results.length && <div className="empty-tracks"><span className="empty-icon">⌕</span><h2>No artists found yet.</h2><p>Try a different name or a broader search.</p></div>}
+            {!loading && !error && results.length > 0 && (
+                <ul className="results-list">
+                    {results.map((result) => (
+                        <li key={result.id} className="result-item surface-card">
+                            {result.avatarUrl ? <img src={apiUrl(result.avatarUrl)} alt="" className="result-avatar" /> : <span className="result-avatar result-avatar-fallback">{result.username.slice(0, 1).toUpperCase()}</span>}
+                            <div className="result-info"><h2>{result.username}</h2><p>{result.bio || 'Independent artist on Sound Hub.'}</p></div>
+                            <span className="artist-badge">ARTIST</span>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </main>
     );
-};
-
-// Helper function to highlight search query in the result text
-const highlightText = (text, query) => {
-    if (!query) return text;
-    const parts = text.split(new RegExp(`(${query})`, 'gi'));
-    return parts.map((part, index) => (
-        part.toLowerCase() === query.toLowerCase() ? <span key={index} className="highlight">{part}</span> : part
-    ));
 };
 
 export default SearchResults;

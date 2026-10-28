@@ -1,40 +1,30 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './About.css';
 
-const About = () => {
-    return (
-        <div className="about-me">
-            <div className="profile-section">
-                <img src='/images/about.jpg' alt="Profile" className="profile-image" />
-                <div className="about-text">
-                    <h1>About Gator!</h1>
-                    <p>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-                        sed do eiusmod tempor incididunt ut labore et dolore magna 
-                        aliqua. Lectus quam id leo in vitae turpis. Semper eget duis 
-                        at tellus at. Potenti nullam ac tortor vitae purus faucibus. 
-                        Iaculis at erat pellentesque adipiscing. Sed pulvinar proin 
-                        gravida hendrerit. Ullamcorper morbi tincidunt ornare massa 
-                        eget. Lorem donec massa sapien faucibus et molestie ac feugiat 
-                        sed. Sapien nec sagittis aliquam malesuada bibendum. In mollis 
-                        nunc sed id semper risus.
-                    </p>
+const About = () => (
+    <main className="page-shell about-page">
+        <section className="about-frame surface-card">
+            <div className="about-founder">
+                <img src="/images/about.jpg" alt="Illustrated portrait representing the Sound Hub founder" />
+                <div className="about-founder-copy">
+                    <p className="eyebrow">THE PERSON BEHIND THE PROJECT</p>
+                    <h1>About Gator</h1>
+                    <p>Sound Hub is a place for independent artists and curious listeners to meet through music. It is built around a simple idea: discovering something new is better when you can share it with other people.</p>
+                    <Link to="/register" className="button button-primary">Join the community</Link>
                 </div>
             </div>
-            <div className="vision-section">
-                <h2>My Vision</h2>
-                <p>
-                    Ever since I was a wee lad, Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-                    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lectus quam id 
-                    leo in vitae turpis. Semper eget duis at tellus at. Potenti nullam ac tortor vitae 
-                    purus faucibus. Iaculis at erat pellentesque adipiscing. Sed pulvinar proin gravida 
-                    hendrerit. Ullamcorper morbi tincidunt ornare massa eget. Lorem donec massa sapien 
-                    faucibus et molestie ac feugiat sed. Sapien nec sagittis aliquam malesuada bibendum.
-                    In mollis nunc sed id semper risus.
-                </p>
+            <div className="about-vision">
+                <p className="eyebrow">WHY SOUND HUB EXISTS</p>
+                <h2>My vision</h2>
+                <p>Make it easier for independent musicians to share their work, find an audience, and connect with people who care about what they create. Whether you are here to release a track, discover an artist, or find a local event, there should be room for you in the mix.</p>
             </div>
-        </div>
-    );
-};
+        </section>
+        <section className="about-cta">
+            <div><p className="eyebrow">INDEPENDENT SOUNDS, SHARED LOUDLY</p><h2>Find your next favorite sound.</h2></div>
+            <Link to="/" className="button button-outline">Explore new releases</Link>
+        </section>
+    </main>
+);
 
 export default About;
